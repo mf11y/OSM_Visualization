@@ -39,6 +39,7 @@
             this.dbPanel1.TabIndex = 0;
             this.dbPanel1.DragDrop += new System.Windows.Forms.DragEventHandler(this.Main_DragDrop);
             this.dbPanel1.DragEnter += new System.Windows.Forms.DragEventHandler(this.Main_DragEnter);
+            this.dbPanel1.Paint += new System.Windows.Forms.PaintEventHandler(this.Main_Paint);
             // 
             // Main
             // 
