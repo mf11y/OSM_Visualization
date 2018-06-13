@@ -23,9 +23,14 @@ namespace OSM_Visualization
         float maxLat;
         float maxLon;
 
+        Bitmap bitmap;
+  
+
         public Main()
         {
             InitializeComponent();
+
+            bitmap = new Bitmap(this.dbPanel1.Width, this.dbPanel1.Height);
         }
 
         void Main_DragEnter(object sender, DragEventArgs e)
@@ -57,7 +62,12 @@ namespace OSM_Visualization
 
                 current = 0;
 
-                foreach(var y in x.ToList())
+                firstPointLat = -1;
+                firstPointLon = -1;
+                secondPointLat = -1;
+                secondPointLon = -1;
+
+                foreach (var y in x.ToList())
                 {
                     if (current == 0)
                     {
@@ -72,8 +82,11 @@ namespace OSM_Visualization
                         current--;
                     }
 
-                    dbPanel1.Refresh();
+                    if(secondPointLat != -1 && firstPointLat != -1 && secondPointLat != -1 && firstPointLon != -1)
+                        dbPanel1.Refresh();
                 }
+
+                //MessageBox.Show("step");
 
                 //MessageBox.Show(string.Join("\n", x));    
             }
@@ -83,17 +96,25 @@ namespace OSM_Visualization
 
         private void Main_Paint(object sender, PaintEventArgs e)
         {
-            Graphics gr = e.Graphics;
+            Graphics gr = Graphics.FromImage(bitmap);
 
-            float normalizedp1Lat = ((firstPointLat - minLat) / (maxLat - minLat)) * 500;
-            float normalizedp1Lon = ((firstPointLon - minLon) / (maxLon - minLon)) * 500;
+            float normalizedp1Lat = ((firstPointLat - minLat) / (maxLat - minLat)) * 500f;
+            float normalizedp1Lon = ((firstPointLon - minLon) / (maxLon - minLon)) * 500f;
+            //normalizedp1Lat = (normalizedp1Lat * -1) + 500f;
+            normalizedp1Lat = Math.Abs(normalizedp1Lat - 500f);
 
-            float normalizedp2Lat = ((secondPointLat - minLat) / (maxLat - minLat)) * 500;
-            float normalizedp2Lon = ((secondPointLon - minLon) / (maxLon - minLon)) * 500;
 
+            float normalizedp2Lat = ((secondPointLat - minLat) / (maxLat - minLat)) * 500f;
+            float normalizedp2Lon = ((secondPointLon - minLon) / (maxLon - minLon)) * 500f;
+            //normalizedp2Lat = (normalizedp2Lat * -1) + 500f;
+            normalizedp2Lat = Math.Abs(normalizedp2Lat - 500f);
 
-            gr.DrawLine(myPen, normalizedp1Lat, normalizedp1Lon, normalizedp2Lat, normalizedp2Lon);
+            //gr.DrawLine(myPen, normalizedp2Lat, normalizedp2Lon, normalizedp1Lat, normalizedp1Lon);
+            gr.DrawLine(myPen, normalizedp2Lon, normalizedp2Lat, normalizedp1Lon, normalizedp1Lat);
+            bitmap.Save(@"c:\temp\bmap.bmp");
             //gr.DrawLine(myPen, 0, 0, 0, 0);
+
+            e.Graphics.DrawImage(bitmap, Point.Empty);
 
             //firstPoint = firstPoint
 
