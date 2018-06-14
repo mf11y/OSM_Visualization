@@ -1,37 +1,29 @@
 ﻿using System.Windows.Forms;
-using System.Xml.Linq;
 using System.Linq;
 using System.Drawing;
 using System;
 using System.Collections.Generic;
 using System.Drawing.Drawing2D;
+using System.Threading.Tasks;
 
 namespace OSM_Visualization
 {
     public partial class Main : Form
     {
 
-        XDocument osmFile = new XDocument();
-
-        float firstPointLat;
-        float firstPointLon;
-        float secondPointLat;
-        float secondPointLon;
-
-        float minLat;
-        float minLon;
-
-        float maxLat;
-        float maxLon;
-
+        OSMDataManager loader;
+        MapDrawer drawer;
         Bitmap bitmap;
-  
+
+        bool firstInit;
 
         public Main()
         {
             InitializeComponent();
+            bitmap = new Bitmap(dbPanel1.Height, dbPanel1.Width);
+            //bitmap.Save(@"c:\temp\bmap.bmp");
 
-            bitmap = new Bitmap(this.dbPanel1.Width, this.dbPanel1.Height);
+            firstInit = true;
         }
 
         void Main_DragEnter(object sender, DragEventArgs e)
@@ -42,85 +34,27 @@ namespace OSM_Visualization
 
         void Main_DragDrop(object sender, DragEventArgs e)
         {
-            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            string[] fileLoc = (string[])e.Data.GetData(DataFormats.FileDrop);
+            loader = new OSMDataManager(fileLoc[0]);
+            drawer = new MapDrawer(dbPanel1, ref loader, ref bitmap);
 
-            osmFile = XDocument.Load(files[0]);
+            draw();
 
-            minLat = float.Parse(osmFile.Root.Element("bounds").Attribute("minlat").Value);
-            minLon = float.Parse(osmFile.Root.Element("bounds").Attribute("minlon").Value);
-            maxLat = float.Parse(osmFile.Root.Element("bounds").Attribute("maxlat").Value);
-            maxLon = float.Parse(osmFile.Root.Element("bounds").Attribute("maxlon").Value);
+            firstInit = false;
 
-
-
-            //var query = osmFile.Descendants("way").Select(item => item.Element("nd"));
-            var query = osmFile.Descendants("way").Where(w => !w.Elements("tag").Any(a => (string)a.Attribute("k") == "building")).Select(x => x.Elements("nd").Select(z => z.Attribute("ref").Value));
-
-
-            int current = 0;
-            foreach (var x in query)
-            {
-                //XDocument ea = XDocument.Parse(x.ToString());
-
-                current = 0;
-
-                firstPointLat = -1;
-                firstPointLon = -1;
-                secondPointLat = -1;
-                secondPointLon = -1;
-
-                foreach (var y in x.ToList())
-                {
-                    if (current == 0)
-                    {
-                        firstPointLat = float.Parse(osmFile.Root.Elements("node").First(z => z.Attribute("id").Value == y).Attribute("lat").Value);
-                        firstPointLon = float.Parse(osmFile.Root.Elements("node").First(z => z.Attribute("id").Value == y).Attribute("lon").Value);
-                        current++;
-                    }
-                    else
-                    {
-                        secondPointLat = float.Parse(osmFile.Root.Elements("node").First(z => z.Attribute("id").Value == y).Attribute("lat").Value);
-                        secondPointLon = float.Parse(osmFile.Root.Elements("node").First(z => z.Attribute("id").Value == y).Attribute("lon").Value);
-                        current--;
-                    }
-
-                    if(secondPointLat != -1 && firstPointLat != -1 && secondPointLat != -1 && firstPointLon != -1)
-                        dbPanel1.Refresh();
-                }
-
-                //MessageBox.Show("step");
-
-                //MessageBox.Show(string.Join("\n", x));    
-            }
         }
 
-        private static readonly Pen myPen = new Pen(Brushes.Red, 3);
+        async void draw()
+        {
+            await Task.Run(() => drawer.DrawMap());
+        }
+
 
         private void Main_Paint(object sender, PaintEventArgs e)
         {
-            Graphics gr = Graphics.FromImage(bitmap);
-
-            gr.SmoothingMode = SmoothingMode.AntiAlias;
-
-            float normalizedp1Lat = ((firstPointLat - minLat) / (maxLat - minLat)) * 1000f;
-            float normalizedp1Lon = ((firstPointLon - minLon) / (maxLon - minLon)) * 1000f;
-            normalizedp1Lat = (normalizedp1Lat * -1) + 1000f;
-            //normalizedp1Lat = Math.Abs(normalizedp1Lat - 500f);
-
-
-            float normalizedp2Lat = ((secondPointLat - minLat) / (maxLat - minLat)) * 1000f;
-            float normalizedp2Lon = ((secondPointLon - minLon) / (maxLon - minLon)) * 1000f;
-            normalizedp2Lat = (normalizedp2Lat * -1) + 1000f;
-            //normalizedp2Lat = Math.Abs(normalizedp2Lat - 500f);
-
-            //gr.DrawLine(myPen, normalizedp2Lat, normalizedp2Lon, normalizedp1Lat, normalizedp1Lon);
-            gr.DrawLine(myPen, normalizedp2Lon, normalizedp2Lat, normalizedp1Lon, normalizedp1Lat);
-            bitmap.Save(@"c:\temp\bmap.bmp");
-            //gr.DrawLine(myPen, 0, 0, 0, 0);
-
-            e.Graphics.DrawImage(bitmap, Point.Empty);
-
-            //firstPoint = firstPoint
+            //bitmap = (Bitmap)Image.FromFile(@"c:\temp\bmap.bmp");
+            if(!firstInit)
+                e.Graphics.DrawImage(bitmap, Point.Empty);
 
         }
     }
