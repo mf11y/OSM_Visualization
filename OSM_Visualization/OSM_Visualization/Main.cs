@@ -4,6 +4,7 @@ using System.Linq;
 using System.Drawing;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 
 namespace OSM_Visualization
 {
@@ -53,7 +54,8 @@ namespace OSM_Visualization
 
 
             //var query = osmFile.Descendants("way").Select(item => item.Element("nd"));
-            var query = osmFile.Descendants("way").Select(x => x.Elements("nd").Select(z => z.Attribute("ref").Value));
+            var query = osmFile.Descendants("way").Where(w => !w.Elements("tag").Any(a => (string)a.Attribute("k") == "building")).Select(x => x.Elements("nd").Select(z => z.Attribute("ref").Value));
+
 
             int current = 0;
             foreach (var x in query)
@@ -92,22 +94,24 @@ namespace OSM_Visualization
             }
         }
 
-        private static readonly Pen myPen = new Pen(Brushes.Red, 1);
+        private static readonly Pen myPen = new Pen(Brushes.Red, 3);
 
         private void Main_Paint(object sender, PaintEventArgs e)
         {
             Graphics gr = Graphics.FromImage(bitmap);
 
-            float normalizedp1Lat = ((firstPointLat - minLat) / (maxLat - minLat)) * 500f;
-            float normalizedp1Lon = ((firstPointLon - minLon) / (maxLon - minLon)) * 500f;
-            //normalizedp1Lat = (normalizedp1Lat * -1) + 500f;
-            normalizedp1Lat = Math.Abs(normalizedp1Lat - 500f);
+            gr.SmoothingMode = SmoothingMode.AntiAlias;
+
+            float normalizedp1Lat = ((firstPointLat - minLat) / (maxLat - minLat)) * 1000f;
+            float normalizedp1Lon = ((firstPointLon - minLon) / (maxLon - minLon)) * 1000f;
+            normalizedp1Lat = (normalizedp1Lat * -1) + 1000f;
+            //normalizedp1Lat = Math.Abs(normalizedp1Lat - 500f);
 
 
-            float normalizedp2Lat = ((secondPointLat - minLat) / (maxLat - minLat)) * 500f;
-            float normalizedp2Lon = ((secondPointLon - minLon) / (maxLon - minLon)) * 500f;
-            //normalizedp2Lat = (normalizedp2Lat * -1) + 500f;
-            normalizedp2Lat = Math.Abs(normalizedp2Lat - 500f);
+            float normalizedp2Lat = ((secondPointLat - minLat) / (maxLat - minLat)) * 1000f;
+            float normalizedp2Lon = ((secondPointLon - minLon) / (maxLon - minLon)) * 1000f;
+            normalizedp2Lat = (normalizedp2Lat * -1) + 1000f;
+            //normalizedp2Lat = Math.Abs(normalizedp2Lat - 500f);
 
             //gr.DrawLine(myPen, normalizedp2Lat, normalizedp2Lon, normalizedp1Lat, normalizedp1Lon);
             gr.DrawLine(myPen, normalizedp2Lon, normalizedp2Lat, normalizedp1Lon, normalizedp1Lat);

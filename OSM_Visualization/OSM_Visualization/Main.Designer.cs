@@ -33,9 +33,9 @@
             // 
             // dbPanel1
             // 
-            this.dbPanel1.Location = new System.Drawing.Point(82, 116);
+            this.dbPanel1.Location = new System.Drawing.Point(126, 39);
             this.dbPanel1.Name = "dbPanel1";
-            this.dbPanel1.Size = new System.Drawing.Size(500, 500);
+            this.dbPanel1.Size = new System.Drawing.Size(1000, 1000);
             this.dbPanel1.TabIndex = 0;
             this.dbPanel1.DragDrop += new System.Windows.Forms.DragEventHandler(this.Main_DragDrop);
             this.dbPanel1.DragEnter += new System.Windows.Forms.DragEventHandler(this.Main_DragEnter);
@@ -47,7 +47,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.ClientSize = new System.Drawing.Size(684, 617);
+            this.ClientSize = new System.Drawing.Size(1321, 1061);
             this.Controls.Add(this.dbPanel1);
             this.Name = "Main";
             this.Text = "Map Visualization";
