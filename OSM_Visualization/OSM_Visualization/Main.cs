@@ -15,15 +15,12 @@ namespace OSM_Visualization
         MapDrawer drawer;
         Bitmap bitmap;
 
-        bool firstInit;
-
         public Main()
         {
             InitializeComponent();
             bitmap = new Bitmap(dbPanel1.Height, dbPanel1.Width);
             //bitmap.Save(@"c:\temp\bmap.bmp");
 
-            firstInit = true;
         }
 
         void Main_DragEnter(object sender, DragEventArgs e)
@@ -40,21 +37,21 @@ namespace OSM_Visualization
 
             draw();
 
-            firstInit = false;
-
         }
 
         async void draw()
         {
             await Task.Run(() => drawer.DrawMap());
+
+
+            dbPanel1.Invalidate();
         }
 
 
         private void Main_Paint(object sender, PaintEventArgs e)
         {
-            //bitmap = (Bitmap)Image.FromFile(@"c:\temp\bmap.bmp");
-            if(!firstInit)
-                e.Graphics.DrawImage(bitmap, Point.Empty);
+
+            e.Graphics.DrawImage(bitmap, Point.Empty);
 
         }
     }
