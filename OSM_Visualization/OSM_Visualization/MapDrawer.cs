@@ -33,8 +33,7 @@ namespace OSM_Visualization
         public void DrawMap(ref OSMDataManager xmlData)
         {
             loader = xmlData;
-            gr.Clear(Color.Gray);
-            //mainPanel.Invalidate();
+            gr.Clear(Color.DarkGreen);
             GetPoint();
             ConnectPoints();
             bag = null;
@@ -42,38 +41,21 @@ namespace OSM_Visualization
 
         private void GetPoint()
         {
-
-
             Parallel.ForEach(loader.waysConnectionInfo, way =>
             {
-                float p1Lat = -1;
-                float p1Lon = -1;
-                float p2Lat = -1;
-                float p2Lon = -1;
-                float current = 0;
+                float p1Lat = 0;
+                float p1Lon = 0;
+                float p2Lat = 0;
+                float p2Lon = 0;
 
 
-                foreach (var node in way)
+                for(int i = 0; i < way.Count() - 1; i++)
                 {
-
-                    if (current == 0)
-                    {
-                        p1Lat = loader.dict[node].Item1;
-                        p1Lon = loader.dict[node].Item2;
-                        current++;
-                    }
-                    else
-                    {
-                        p2Lat = loader.dict[node].Item1;
-                        p2Lon = loader.dict[node].Item2;
-
-                        current--;
-                    }
-
-                    if (p1Lat != -1 && p2Lat != -1 && p1Lon != -1 && p2Lon != -1)
-                    {
-                        bag.Add(new Tuple<float, float, float, float>(p1Lat, p1Lon, p2Lat, p2Lon));
-                    }
+                    p1Lat = loader.dict[way[i]].Item1;
+                    p1Lon = loader.dict[way[i]].Item2;
+                    p2Lat = loader.dict[way[i + 1]].Item1;
+                    p2Lon = loader.dict[way[i + 1]].Item2;
+                    bag.Add(new Tuple<float, float, float, float>(p1Lat, p1Lon, p2Lat, p2Lon));
                 }
             });
         }
@@ -92,18 +74,18 @@ namespace OSM_Visualization
 
             foreach (var x in bag)
             {
-                normalizedp1Lat = ((x.Item1 - loader.minLat) / (loader.maxLat - loader.minLat)) * 1000f;
-                normalizedp1Lon = ((x.Item2 - loader.minLon) / (loader.maxLon - loader.minLon)) * 1000f;
-                rotatedp1Lat = (normalizedp1Lat * -1) + 1000f;
+                normalizedp1Lat = ((x.Item1 - loader.minLat) / (loader.maxLat - loader.minLat)) * (float )bitmap.Height;
+                normalizedp1Lon = ((x.Item2 - loader.minLon) / (loader.maxLon - loader.minLon)) * (float )bitmap.Width;
+                rotatedp1Lat = (normalizedp1Lat * -1) + (float)bitmap.Height;
 
 
-                normalizedp2Lat = ((x.Item3 - loader.minLat) / (loader.maxLat - loader.minLat)) * 1000f;
-                normalizedp2Lon = ((x.Item4 - loader.minLon) / (loader.maxLon - loader.minLon)) * 1000f;
-                rotatedp2Lat = (normalizedp2Lat * -1) + 1000f;
+                normalizedp2Lat = ((x.Item3 - loader.minLat) / (loader.maxLat - loader.minLat)) * (float)bitmap.Height;
+                normalizedp2Lon = ((x.Item4 - loader.minLon) / (loader.maxLon - loader.minLon)) * (float)bitmap.Width;
+                rotatedp2Lat = (normalizedp2Lat * -1) + (float)bitmap.Height;
 
                 gr.DrawLine(myPen, normalizedp2Lon, rotatedp2Lat, normalizedp1Lon, rotatedp1Lat);
 
-                mainPanel.Invalidate();
+                //mainPanel.Invalidate();
                //Thread.Sleep(1);
             }
 
@@ -116,7 +98,7 @@ namespace OSM_Visualization
                 counter = 0;
             }*/
 
-            //mainPanel.Invalidate();
+            mainPanel.Invalidate();
         }
     }
 

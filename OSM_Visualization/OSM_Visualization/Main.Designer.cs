@@ -1,6 +1,6 @@
 ﻿namespace OSM_Visualization
 {
-    partial class Main
+    partial class Main1
     {
         /// <summary>
         /// Required designer variable.
@@ -33,23 +33,25 @@
             // 
             // dbPanel1
             // 
-            this.dbPanel1.Location = new System.Drawing.Point(126, 39);
+            this.dbPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dbPanel1.Location = new System.Drawing.Point(0, 0);
+            this.dbPanel1.Margin = new System.Windows.Forms.Padding(0);
             this.dbPanel1.Name = "dbPanel1";
-            this.dbPanel1.Size = new System.Drawing.Size(1000, 1000);
+            this.dbPanel1.Size = new System.Drawing.Size(994, 585);
             this.dbPanel1.TabIndex = 0;
             this.dbPanel1.DragDrop += new System.Windows.Forms.DragEventHandler(this.Main_DragDrop);
             this.dbPanel1.DragEnter += new System.Windows.Forms.DragEventHandler(this.Main_DragEnter);
             this.dbPanel1.Paint += new System.Windows.Forms.PaintEventHandler(this.Main_Paint);
             // 
-            // Main
+            // Main1
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.ClientSize = new System.Drawing.Size(1321, 1061);
+            this.ClientSize = new System.Drawing.Size(994, 585);
             this.Controls.Add(this.dbPanel1);
-            this.Name = "Main";
+            this.Name = "Main1";
             this.Text = "Map Visualization";
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.Main_DragDrop);
             this.DragEnter += new System.Windows.Forms.DragEventHandler(this.Main_DragEnter);

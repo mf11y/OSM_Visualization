@@ -5,20 +5,23 @@ using System;
 using System.Collections.Generic;
 using System.Drawing.Drawing2D;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace OSM_Visualization
 {
-    public partial class Main : Form
+    public partial class Main1 : Form
     {
 
         OSMDataManager xmlData;
         MapDrawer drawer;
         Bitmap bitmap;
 
-        public Main()
+        public Main1()
         {
             InitializeComponent();
-            bitmap = new Bitmap(dbPanel1.Height, dbPanel1.Width);
+            this.WindowState = FormWindowState.Maximized;
+            bitmap = new Bitmap(Screen.GetWorkingArea(this).Width, Screen.GetWorkingArea(this).Height);
+
         }
 
         void Main_DragEnter(object sender, DragEventArgs e)
