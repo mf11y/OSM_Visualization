@@ -20,9 +20,8 @@ namespace OSM_Visualization
         ConcurrentBag<Tuple<float, float,float, float>> bag;
 
 
-        public MapDrawer(DBPanel panel, ref OSMDataManager importedLoader, ref Bitmap bit)
+        public MapDrawer(DBPanel panel, ref Bitmap bit)
         {
-            loader = importedLoader;
             mainPanel = panel;
             bitmap = bit;
             gr = Graphics.FromImage(bitmap);
@@ -31,16 +30,19 @@ namespace OSM_Visualization
             bag = new ConcurrentBag<Tuple<float, float, float, float>>();
         }
 
-        public void DrawMap()
+        public void DrawMap(ref OSMDataManager xmlData)
         {
-            gr.Clear(Color.White);
-            GetPointsAndConnect();
+            loader = xmlData;
+            gr.Clear(Color.Gray);
+            //mainPanel.Invalidate();
+            GetPoint();
+            ConnectPoints();
+            bag = null;
         }
 
-        private void GetPointsAndConnect()
+        private void GetPoint()
         {
 
-            var Nodes = loader.osmFile.Root.Elements("node");
 
             Parallel.ForEach(loader.waysConnectionInfo, way =>
             {
@@ -53,21 +55,19 @@ namespace OSM_Visualization
 
                 foreach (var node in way)
                 {
-                    var specificNode = Nodes
-                                        .First(z => z.Attribute("id").Value == node);
 
                     if (current == 0)
                     {
-                       p1Lat = float.Parse(specificNode.Attribute("lat").Value);
-                       p1Lon = float.Parse(specificNode.Attribute("lon").Value);
-                       current++;
+                        p1Lat = loader.dict[node].Item1;
+                        p1Lon = loader.dict[node].Item2;
+                        current++;
                     }
                     else
                     {
-                       p2Lat = float.Parse(specificNode.Attribute("lat").Value);
-                       p2Lon = float.Parse(specificNode.Attribute("lon").Value);
+                        p2Lat = loader.dict[node].Item1;
+                        p2Lon = loader.dict[node].Item2;
 
-                       current--;
+                        current--;
                     }
 
                     if (p1Lat != -1 && p2Lat != -1 && p1Lon != -1 && p2Lon != -1)
@@ -76,11 +76,9 @@ namespace OSM_Visualization
                     }
                 }
             });
-
-            ConnectPoints();
         }
 
-        private static readonly Pen myPen = new Pen(Brushes.Red, 2);
+        private static readonly Pen myPen = new Pen(Brushes.White, .1f);
 
         private void ConnectPoints()
         {
@@ -106,7 +104,7 @@ namespace OSM_Visualization
                 gr.DrawLine(myPen, normalizedp2Lon, rotatedp2Lat, normalizedp1Lon, rotatedp1Lat);
 
                 mainPanel.Invalidate();
-                //Thread.Sleep(1);
+               //Thread.Sleep(1);
             }
 
 

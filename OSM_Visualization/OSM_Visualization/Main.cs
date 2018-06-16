@@ -11,7 +11,7 @@ namespace OSM_Visualization
     public partial class Main : Form
     {
 
-        OSMDataManager loader;
+        OSMDataManager xmlData;
         MapDrawer drawer;
         Bitmap bitmap;
 
@@ -19,8 +19,6 @@ namespace OSM_Visualization
         {
             InitializeComponent();
             bitmap = new Bitmap(dbPanel1.Height, dbPanel1.Width);
-            //bitmap.Save(@"c:\temp\bmap.bmp");
-
         }
 
         void Main_DragEnter(object sender, DragEventArgs e)
@@ -29,30 +27,24 @@ namespace OSM_Visualization
                 e.Effect = DragDropEffects.Copy;
         }
 
-        void Main_DragDrop(object sender, DragEventArgs e)
+        async void Main_DragDrop(object sender, DragEventArgs e)
         {
             string[] fileLoc = (string[])e.Data.GetData(DataFormats.FileDrop);
-            loader = new OSMDataManager(fileLoc[0]);
-            drawer = new MapDrawer(dbPanel1, ref loader, ref bitmap);
 
-            draw();
+            await Task.Run(() => GetData(fileLoc[0])); 
 
+            drawer = new MapDrawer(dbPanel1, ref bitmap);
+            await Task.Run(() => Draw());
+
+            xmlData = null;
+            drawer = null;
         }
 
-        async void draw()
-        {
-            await Task.Run(() => drawer.DrawMap());
+        void GetData(string fileLoc) => xmlData = new OSMDataManager(fileLoc);
 
+        void Draw() => drawer.DrawMap(ref xmlData);
 
-            dbPanel1.Invalidate();
-        }
+        private void Main_Paint(object sender, PaintEventArgs e) => e.Graphics.DrawImage(bitmap, Point.Empty);
 
-
-        private void Main_Paint(object sender, PaintEventArgs e)
-        {
-
-            e.Graphics.DrawImage(bitmap, Point.Empty);
-
-        }
     }
 }
