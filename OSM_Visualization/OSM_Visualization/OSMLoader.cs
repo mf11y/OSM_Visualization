@@ -11,43 +11,35 @@ using System.Xml.XPath;
 
 namespace OSM_Visualization
 {
-    class OSMDataManager
+    class OSMDataManager : IDisposable
     {
         public float minLat { get; private set; }
         public float minLon { get; private set; }
         public float maxLat { get; private set; }
         public float maxLon { get; private set; }
 
-        public ConcurrentDictionary<string, Tuple<float,float>> dict;
-
-
+        public ConcurrentDictionary<string, Tuple<string,string>> dict;
         public List<List<string>> waysConnectionInfo { get; private set; }
-        //public IEnumerable<IEnumerable<string>> waysConnectionInfo;
 
         public OSMDataManager(string fileLoc)
         {
-            //XDocument osmFile;
-
-            //osmFile = XDocument.Load(fileLoc);
 
             XmlReader xReader = XmlReader.Create(fileLoc);
-            //xReader.MoveToContent();
+
 
             int concurrencyLevel = Environment.ProcessorCount * 2;
-            dict = new ConcurrentDictionary<string, Tuple<float, float>>(concurrencyLevel, 2000003);
-
+            dict = new ConcurrentDictionary<string, Tuple<string, string>>(concurrencyLevel, 2000003);
             waysConnectionInfo = new List<List<string>>();
 
             ParseXML(ref xReader);
-            Thread.Sleep(1);
 
-            //osmFile = null;
-            //GC.Collect();
+            xReader.Dispose();
 
         }
         private void ParseXML(ref XmlReader File)
         {
-            while (File.Read())
+            bool member = false;
+            while (File.Read() && !member)
             {
                 if (File.NodeType == XmlNodeType.Element)
                 {
@@ -74,14 +66,11 @@ namespace OSM_Visualization
                                                 temp.Add(inner.GetAttribute("ref"));
                                             break;
                                         case "tag":
-                                        {
                                             if (inner.GetAttribute("k") == "highway")
                                             {
                                                 valid = true;
                                             }
-
-                                                break;
-                                        }
+                                            break;
                                     }
                                 }
                             }
@@ -92,14 +81,22 @@ namespace OSM_Visualization
                             break;
                         case "node":
                             dict.TryAdd(File.GetAttribute("id"),
-                                            new Tuple<float, float>(float.Parse(File.GetAttribute("lat")), float.Parse(File.GetAttribute("lon"))));
+                                            new Tuple<string, string>(File.GetAttribute("lat"), File.GetAttribute("lon")));
                             break;
                         case "member":
+                            member = true;
                                 break;
                     }
                 }
-
             }
         }
+
+        public void Dispose()
+        {
+            dict = null;
+            waysConnectionInfo = null;
+            GC.SuppressFinalize(this);
+        }
+
     }
 }

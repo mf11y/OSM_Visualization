@@ -1,6 +1,6 @@
 ﻿namespace OSM_Visualization
 {
-    partial class Main1
+    partial class MainWindow
     {
         /// <summary>
         /// Required designer variable.
@@ -28,33 +28,43 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.DrawButton = new System.Windows.Forms.Button();
             this.dbPanel1 = new OSM_Visualization.DBPanel();
             this.SuspendLayout();
             // 
+            // DrawButton
+            // 
+            this.DrawButton.Location = new System.Drawing.Point(381, 10);
+            this.DrawButton.Name = "DrawButton";
+            this.DrawButton.Size = new System.Drawing.Size(172, 32);
+            this.DrawButton.TabIndex = 1;
+            this.DrawButton.Text = "Draw";
+            this.DrawButton.UseVisualStyleBackColor = true;
+            this.DrawButton.Click += new System.EventHandler(this.Draw_buttonClick);
+            // 
             // dbPanel1
             // 
-            this.dbPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dbPanel1.Location = new System.Drawing.Point(0, 0);
+            this.dbPanel1.AllowDrop = true;
+            this.dbPanel1.BackColor = System.Drawing.SystemColors.GrayText;
+            this.dbPanel1.Location = new System.Drawing.Point(0, 45);
             this.dbPanel1.Margin = new System.Windows.Forms.Padding(0);
             this.dbPanel1.Name = "dbPanel1";
-            this.dbPanel1.Size = new System.Drawing.Size(994, 585);
+            this.dbPanel1.Size = new System.Drawing.Size(994, 540);
             this.dbPanel1.TabIndex = 0;
             this.dbPanel1.DragDrop += new System.Windows.Forms.DragEventHandler(this.Main_DragDrop);
             this.dbPanel1.DragEnter += new System.Windows.Forms.DragEventHandler(this.Main_DragEnter);
             this.dbPanel1.Paint += new System.Windows.Forms.PaintEventHandler(this.Main_Paint);
             // 
-            // Main1
+            // MainWindow
             // 
-            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.ClientSize = new System.Drawing.Size(994, 585);
+            this.Controls.Add(this.DrawButton);
             this.Controls.Add(this.dbPanel1);
-            this.Name = "Main1";
+            this.Name = "MainWindow";
             this.Text = "Map Visualization";
-            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.Main_DragDrop);
-            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.Main_DragEnter);
             this.ResumeLayout(false);
 
         }
@@ -62,6 +72,7 @@
         #endregion
 
         private DBPanel dbPanel1;
+        private System.Windows.Forms.Button DrawButton;
     }
 }
 
