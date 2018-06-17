@@ -13,10 +13,10 @@ namespace OSM_Visualization
 {
     class OSMDataManager : IDisposable
     {
-        public float minLat { get; private set; }
-        public float minLon { get; private set; }
-        public float maxLat { get; private set; }
-        public float maxLon { get; private set; }
+        public float minLat { get; set; }
+        public float minLon { get; set; }
+        public float maxLat { get; set; }
+        public float maxLon { get; set; }
 
         public ConcurrentDictionary<string, Tuple<string,string>> dict;
         public List<List<string>> waysConnectionInfo { get; private set; }

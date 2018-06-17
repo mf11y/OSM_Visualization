@@ -32,14 +32,14 @@ namespace OSM_Visualization
             Transformed = new ConcurrentBag<Tuple<float, float, float, float>>();
         }
 
-        public Bitmap DrawMap(ref OSMDataManager xmlData)
+        public void DrawMap(ref OSMDataManager xmlData, float zoomFactor)
         {
             loader = xmlData;
-            gr.Clear(Color.Gray);
-            GetPoints();
-            ConnectPoints();
 
-            return bitmap;
+            if(zoomFactor > .9f)
+                GetPoints();
+
+            ConnectPoints(zoomFactor);
         }
 
         private void GetPoints()
@@ -65,8 +65,28 @@ namespace OSM_Visualization
 
         private static readonly Pen myPen = new Pen(Brushes.White, .1f);
 
-        private void ConnectPoints()
+        private void ConnectPoints(float zoomFactor)
         {
+            float diff1 = loader.maxLon - loader.minLon;
+            float diff2 = loader.maxLat - loader.minLat;
+
+            if (zoomFactor < 1f)
+            {
+                gr.Clear(Color.Gray);
+                mainPanel.Invalidate();
+                float zoomed1 = diff2 * zoomFactor;
+                float zoomed2 = diff1 * zoomFactor;
+
+                float sub1 = (diff2 - zoomed1) / 2f ;
+                loader.maxLat -= sub1;
+                loader.minLat += sub1;
+
+                float sub2 = (diff1 - zoomed2) /2f;
+                loader.maxLon -= sub2;
+                loader.minLon += sub2;
+            }
+
+
             float H = (float)bitmap.Height;
             float W = (float)bitmap.Width;
 
@@ -80,23 +100,36 @@ namespace OSM_Visualization
                 float rotatedp1Lat;
                 float rotatedp2Lat;
 
-                normalizedp1Lat = ((x.Item1 - loader.minLat) / (loader.maxLat - loader.minLat)) * H;
-                normalizedp1Lon = ((x.Item2 - loader.minLon) / (loader.maxLon - loader.minLon)) * W;
-                rotatedp1Lat = (normalizedp1Lat * -1) + H;
+                if (x.Item1 < loader.maxLat && x.Item1 > loader.minLat &&
+                   x.Item2 < loader.maxLon && x.Item2 > loader.minLon &&
+                   x.Item3 < loader.maxLat && x.Item3 > loader.minLat &&
+                   x.Item2 < loader.maxLon && x.Item2 > loader.minLon)
+                {
+
+                    normalizedp1Lat = ((x.Item1 - loader.minLat) / (loader.maxLat - loader.minLat)) * H;
+                    normalizedp1Lon = ((x.Item2 - loader.minLon) / (loader.maxLon - loader.minLon)) * W;
+                    rotatedp1Lat = (normalizedp1Lat * -1) + H ;
 
 
-                normalizedp2Lat = ((x.Item3 - loader.minLat) / (loader.maxLat - loader.minLat)) * H;
-                normalizedp2Lon = ((x.Item4 - loader.minLon) / (loader.maxLon - loader.minLon)) * W;
-                rotatedp2Lat = (normalizedp2Lat * -1) + H;
+                    normalizedp2Lat = ((x.Item3 - loader.minLat) / (loader.maxLat - loader.minLat)) * H;
+                    normalizedp2Lon = ((x.Item4 - loader.minLon) / (loader.maxLon - loader.minLon)) * W;
+                    rotatedp2Lat = (normalizedp2Lat * -1) + H;
 
-                Transformed.Add(new Tuple<float, float, float, float>(normalizedp2Lon, rotatedp2Lat, normalizedp1Lon, rotatedp1Lat));
+                    Transformed.Add(new Tuple<float, float, float, float>(normalizedp2Lon, rotatedp2Lat, normalizedp1Lon, rotatedp1Lat));
+                }
             });
-            
-            foreach(var x in Transformed)
+
+            gr.Clear(Color.Gray);
+
+            foreach (var x in Transformed)
             {
                 gr.DrawLine(myPen, x.Item1, x.Item2, x.Item3, x.Item4);
                 //mainPanel.Invalidate();
             }
+
+            Transformed = new ConcurrentBag<Tuple<float, float, float, float>>();
+
+            mainPanel.Invalidate();
 
         }
 
