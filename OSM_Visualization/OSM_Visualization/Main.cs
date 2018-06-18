@@ -17,9 +17,6 @@ namespace OSM_Visualization
         MapDrawer drawer;
         OSMDataManager xmlData;
 
-        Graphics gr;
-
-
         public MainWindow()
         {
             InitializeComponent();
@@ -37,9 +34,7 @@ namespace OSM_Visualization
 
             DrawButton.Location = new Point((bitmap.Width / 2) - DrawButton.Width / 2, 10);
             trackBar1.Location = new Point((bitmap.Width / 2) - trackBar1.Width / 2, bitmap.Height - 50);
-
-            this.Cursor = Cursors.SizeAll;
-
+            textBox1.Location = new Point((bitmap.Width / 2) - textBox1.Width / 2, (bitmap.Height / 2) - textBox1.Height);
 
         }
 
@@ -59,10 +54,9 @@ namespace OSM_Visualization
         void Draw_buttonClick(object sender, EventArgs e)
         {
 
-            LoadingScreen();
+            textBox1.Visible = true;
             DrawButton.Enabled = false;
             LoadAndDraw();
-            trackBar1.Enabled = true;
         }
 
         async void LoadAndDraw()
@@ -78,24 +72,14 @@ namespace OSM_Visualization
             //await Task.Run(() => xmlData.Dispose());
 
             GC.Collect();
+            textBox1.Visible = false;
+            trackBar1.Enabled = true;
             RefreshScreen();
         }
 
         Bitmap Draw(ref OSMDataManager xmlData, MapDrawer drawer) => drawer.DrawMap(ref xmlData);
 
         private void Main_Paint(object sender, PaintEventArgs e) => e.Graphics.DrawImage(bitmap, Point.Empty);
-
-        Font FontDraw = new Font("Arial", 56);
-        SolidBrush drawBrush = new SolidBrush(Color.White);
-
-        private void LoadingScreen()
-        {
-            gr = Graphics.FromImage(bitmap);
-            gr.SmoothingMode = SmoothingMode.HighQuality;
-            gr.Clear(Color.Gray);
-            gr.DrawString("Loading...", FontDraw, drawBrush, bitmap.Width / 2 - 125, bitmap.Height / 2 - 50);
-            dbPanel1.Refresh();
-        }
 
         private void RefreshScreen()
         {
@@ -105,7 +89,7 @@ namespace OSM_Visualization
         private void trackBar1_Scroll(object sender, EventArgs e)
         {
 
-            if (trackBar1.Value % 25 == 0)
+            if (trackBar1.Value % 5 == 0)
             {
                 xmlData.ZoomBounds(trackBar1.Value);
                 bitmap = new Bitmap(drawer.DrawMap(ref xmlData));

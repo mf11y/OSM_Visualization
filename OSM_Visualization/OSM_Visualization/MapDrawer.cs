@@ -75,8 +75,13 @@ namespace OSM_Visualization
 
             Parallel.ForEach(linePoints, x =>
             {
-                transformedPoints.Add(NormalizeAndRotate(x, H, W));
-
+                if (x.Item1 < loader.maxLat && x.Item1 > loader.minLat &&
+                   x.Item2 < loader.maxLon && x.Item2 > loader.minLon &&
+                   x.Item3 < loader.maxLat && x.Item3 > loader.minLat &&
+                   x.Item4 < loader.maxLon && x.Item4 > loader.minLon)
+                {
+                    transformedPoints.Add(NormalizeAndRotate(x, H, W));
+                }
             });
         }
 

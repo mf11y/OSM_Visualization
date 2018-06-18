@@ -31,6 +31,7 @@
             this.DrawButton = new System.Windows.Forms.Button();
             this.dbPanel1 = new OSM_Visualization.DBPanel();
             this.trackBar1 = new System.Windows.Forms.TrackBar();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.dbPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.SuspendLayout();
@@ -50,6 +51,7 @@
             // 
             this.dbPanel1.AllowDrop = true;
             this.dbPanel1.BackColor = System.Drawing.SystemColors.GrayText;
+            this.dbPanel1.Controls.Add(this.textBox1);
             this.dbPanel1.Controls.Add(this.trackBar1);
             this.dbPanel1.Location = new System.Drawing.Point(0, 45);
             this.dbPanel1.Margin = new System.Windows.Forms.Padding(0);
@@ -71,6 +73,20 @@
             this.trackBar1.TabStop = false;
             this.trackBar1.TickFrequency = 25;
             this.trackBar1.Scroll += new System.EventHandler(this.trackBar1_Scroll);
+            // 
+            // textBox1
+            // 
+            this.textBox1.BackColor = System.Drawing.SystemColors.GrayText;
+            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textBox1.Enabled = false;
+            this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 50F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox1.Location = new System.Drawing.Point(332, 201);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(337, 76);
+            this.textBox1.TabIndex = 1;
+            this.textBox1.Text = "Loading. . .";
+            this.textBox1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textBox1.Visible = false;
             // 
             // MainWindow
             // 
@@ -94,6 +110,7 @@
         private DBPanel dbPanel1;
         private System.Windows.Forms.Button DrawButton;
         private System.Windows.Forms.TrackBar trackBar1;
+        private System.Windows.Forms.TextBox textBox1;
     }
 }
 
