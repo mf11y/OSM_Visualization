@@ -17,7 +17,6 @@ namespace OSM_Visualization
         MapDrawer drawer;
         OSMDataManager xmlData;
 
-        int timesCalled = 0;
 
         public MainWindow()
         {
@@ -63,8 +62,6 @@ namespace OSM_Visualization
             Graphics gr;
             gr = Graphics.FromImage(bitmap);
             gr.SmoothingMode = SmoothingMode.HighQuality;
-            gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
             SolidBrush drawBrush = new SolidBrush(Color.White);
 
             gr.Clear(Color.Gray);
@@ -100,8 +97,6 @@ namespace OSM_Visualization
 
         private void ZoomButton_Click(object sender, EventArgs e)
         {
-            timesCalled++;
-
             drawer.DrawMap(ref xmlData, 1);
         }
 

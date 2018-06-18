@@ -70,50 +70,61 @@ namespace OSM_Visualization
             if (zoomOption == 1 || zoomOption == 2)
                 loader.ZoomBounds(zoomOption);
 
-            float H = (float)bitmap.Height;
-            float W = (float)bitmap.Width;
+            int H = bitmap.Height;
+            int W = bitmap.Width;
 
             Parallel.ForEach(bag, x =>
             {
-                float normalizedp1Lat;
-                float normalizedp2Lon;
-                float normalizedp1Lon;
-                float normalizedp2Lat;
-
-                float rotatedp1Lat;
-                float rotatedp2Lat;
-
                 if (x.Item1 < loader.maxLat && x.Item1 > loader.minLat &&
                    x.Item2 < loader.maxLon && x.Item2 > loader.minLon &&
                    x.Item3 < loader.maxLat && x.Item3 > loader.minLat &&
                    x.Item2 < loader.maxLon && x.Item2 > loader.minLon)
                 {
 
-                    normalizedp1Lat = ((x.Item1 - loader.minLat) / (loader.maxLat - loader.minLat)) * H;
-                    normalizedp1Lon = ((x.Item2 - loader.minLon) / (loader.maxLon - loader.minLon)) * W;
-                    rotatedp1Lat = (normalizedp1Lat * -1) + H ;
+                    Tuple<float, float, float, float> normalizedValues = NormalizeAndRotate(x, H, W);
 
-
-                    normalizedp2Lat = ((x.Item3 - loader.minLat) / (loader.maxLat - loader.minLat)) * H;
-                    normalizedp2Lon = ((x.Item4 - loader.minLon) / (loader.maxLon - loader.minLon)) * W;
-                    rotatedp2Lat = (normalizedp2Lat * -1) + H;
-
-                    Transformed.Add(new Tuple<float, float, float, float>(normalizedp2Lon, rotatedp2Lat, normalizedp1Lon, rotatedp1Lat));
+                    Transformed.Add(new Tuple<float, float, float, float>
+                                    (normalizedValues.Item1, normalizedValues.Item2,
+                                    normalizedValues.Item3, normalizedValues.Item4));
                 }
             });
 
-            gr.Clear(Color.Gray);
-
-            foreach (var x in Transformed)
-            {
-                gr.DrawLine(myPen, x.Item1, x.Item2, x.Item3, x.Item4);
-                //mainPanel.Invalidate();
-            }
+            Draw();
 
             Transformed = new ConcurrentBag<Tuple<float, float, float, float>>();
 
-            mainPanel.Invalidate();
+        }
 
+        private Tuple<float,float,float,float> NormalizeAndRotate(Tuple<float, float, float, float> unNormalizedValues, int H, int W)
+        {
+            float normalizedp1Lat;
+            float normalizedp2Lon;
+            float normalizedp1Lon;
+            float normalizedp2Lat;
+
+            float rotatedp1Lat;
+            float rotatedp2Lat;
+
+            normalizedp1Lat = ((unNormalizedValues.Item1 - loader.minLat) / (loader.maxLat - loader.minLat)) * H;
+            normalizedp1Lon = ((unNormalizedValues.Item2 - loader.minLon) / (loader.maxLon - loader.minLon)) * W;
+            rotatedp1Lat = (normalizedp1Lat * -1) + H;
+
+
+            normalizedp2Lat = ((unNormalizedValues.Item3 - loader.minLat) / (loader.maxLat - loader.minLat)) * H;
+            normalizedp2Lon = ((unNormalizedValues.Item4 - loader.minLon) / (loader.maxLon - loader.minLon)) * W;
+            rotatedp2Lat = (normalizedp2Lat * -1) + H;
+
+            return (new Tuple<float, float, float, float>(normalizedp2Lon, rotatedp2Lat, normalizedp1Lon, rotatedp1Lat));
+        }
+
+        private void Draw()
+        {
+            gr.Clear(Color.Gray);
+
+            foreach (var x in Transformed)
+                gr.DrawLine(myPen, x.Item1, x.Item2, x.Item3, x.Item4);
+
+            mainPanel.Invalidate();
         }
 
         public void Dispose()
