@@ -36,6 +36,7 @@ namespace OSM_Visualization
             dbPanel1.Location = new Point(0, 50);
 
             DrawButton.Location = new Point((bitmap.Width / 2) - DrawButton.Width / 2, 10);
+            trackBar1.Location = new Point((bitmap.Width / 2) - trackBar1.Width / 2, bitmap.Height - 50);
 
             this.Cursor = Cursors.SizeAll;
 
@@ -61,6 +62,7 @@ namespace OSM_Visualization
             LoadingScreen();
             DrawButton.Enabled = false;
             LoadAndDraw();
+            trackBar1.Enabled = true;
         }
 
         async void LoadAndDraw()
@@ -95,26 +97,20 @@ namespace OSM_Visualization
             dbPanel1.Refresh();
         }
 
-        private void ZoomButton_Click(object sender, EventArgs e)
-        {
-            LoadingScreen();
-            xmlData.ZoomBounds(1);
-            bitmap = new Bitmap(drawer.DrawMap(ref xmlData));
-            RefreshScreen();
-        }
-
-        private void ZoomOutButton_Click(object sender, EventArgs e)
-        {
-            LoadingScreen();
-            xmlData.ZoomBounds(2);
-            bitmap = new Bitmap(drawer.DrawMap(ref xmlData));
-            RefreshScreen();
-        }
-
         private void RefreshScreen()
         {
             dbPanel1.Invalidate();
         }
 
+        private void trackBar1_Scroll(object sender, EventArgs e)
+        {
+
+            if (trackBar1.Value % 25 == 0)
+            {
+                xmlData.ZoomBounds(trackBar1.Value);
+                bitmap = new Bitmap(drawer.DrawMap(ref xmlData));
+                RefreshScreen();
+            }
+        }
     }
 }

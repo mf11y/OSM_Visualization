@@ -18,7 +18,10 @@ namespace OSM_Visualization
         public float maxLat { get; private set; }
         public float maxLon { get; private set; }
 
-        private Stack<Tuple<float, float, float, float>> latLonZoomHistory;
+        private float ogMaxLat;
+        private float ogMinLat;
+        private float ogMaxLon;
+        private float ogMinLon;
 
         public ConcurrentDictionary<string, Tuple<string,string>> dict;
         public List<List<string>> waysConnectionInfo { get; private set; }
@@ -32,7 +35,6 @@ namespace OSM_Visualization
             int concurrencyLevel = Environment.ProcessorCount * 2;
             dict = new ConcurrentDictionary<string, Tuple<string, string>>(concurrencyLevel, 2000003);
             waysConnectionInfo = new List<List<string>>();
-            latLonZoomHistory = new Stack<Tuple<float, float, float, float>>();
 
             ParseXML(ref xReader);
 
@@ -53,9 +55,13 @@ namespace OSM_Visualization
                     {
                         case "bounds":
                             minLat = float.Parse(File.GetAttribute("minlat"));
+                            ogMinLat = minLat;
                             minLon = float.Parse(File.GetAttribute("minlon"));
+                            ogMinLon = minLon;
                             maxLat = float.Parse(File.GetAttribute("maxlat"));
+                            ogMaxLat = maxLat;
                             maxLon = float.Parse(File.GetAttribute("maxlon"));
+                            ogMaxLon = maxLon;
                             break;
                         case "way":
                             XmlReader inner = File.ReadSubtree();
@@ -97,37 +103,26 @@ namespace OSM_Visualization
             }
         }
 
-        public void ZoomBounds(int zoomOption)
+
+        public void ZoomBounds(int trackerPos)
         {
-            if (zoomOption == 1)
-            {
-                latLonZoomHistory.Push(new Tuple<float, float, float, float>(maxLat, minLat, maxLon, minLon));
+            float zoomFactor = (1f - (trackerPos / 100f));
 
-                float zoomFactor = .75f;
+            maxLon = ogMaxLon;
+            minLon = ogMinLon;
+            maxLat = ogMaxLat;
+            minLat = ogMinLat;
 
-                float ogLatDiff = maxLat - minLat;
-                float ogLonDiff = maxLon - minLon;
+            float ogLatDiff = maxLat - minLat;
+            float ogLonDiff = maxLon - minLon;
 
-                float zoomByLat = (ogLatDiff - (ogLatDiff * zoomFactor)) / 2;
-                maxLat -= zoomByLat;
-                minLat += zoomByLat;
+            float zoomByLat = (ogLatDiff - (ogLatDiff * zoomFactor)) / 2;
+            maxLat -= zoomByLat;
+            minLat += zoomByLat;
 
-                float zoomByLon = (ogLonDiff - (ogLonDiff * zoomFactor)) / 2;
-                maxLon -= zoomByLon;
-                minLon += zoomByLon;
-            }
-            else
-            {
-                if (latLonZoomHistory.Count != 0)
-                {
-                    maxLat = latLonZoomHistory.Peek().Item1;
-                    minLat = latLonZoomHistory.Peek().Item2;
-                    maxLon = latLonZoomHistory.Peek().Item3;
-                    minLon = latLonZoomHistory.Peek().Item4;
-                    latLonZoomHistory.Pop();
-                }
-            }
-
+            float zoomByLon = (ogLonDiff - (ogLonDiff * zoomFactor)) / 2;
+            maxLon -= zoomByLon;
+            minLon += zoomByLon;
         }
 
         public void Dispose()

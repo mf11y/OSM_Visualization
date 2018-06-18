@@ -29,9 +29,10 @@
         private void InitializeComponent()
         {
             this.DrawButton = new System.Windows.Forms.Button();
-            this.ZoomButton = new System.Windows.Forms.Button();
             this.dbPanel1 = new OSM_Visualization.DBPanel();
-            this.ZoomOutButton = new System.Windows.Forms.Button();
+            this.trackBar1 = new System.Windows.Forms.TrackBar();
+            this.dbPanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.SuspendLayout();
             // 
             // DrawButton
@@ -45,20 +46,11 @@
             this.DrawButton.UseVisualStyleBackColor = true;
             this.DrawButton.Click += new System.EventHandler(this.Draw_buttonClick);
             // 
-            // ZoomButton
-            // 
-            this.ZoomButton.Location = new System.Drawing.Point(37, 10);
-            this.ZoomButton.Name = "ZoomButton";
-            this.ZoomButton.Size = new System.Drawing.Size(172, 32);
-            this.ZoomButton.TabIndex = 2;
-            this.ZoomButton.Text = "Zoom";
-            this.ZoomButton.UseVisualStyleBackColor = true;
-            this.ZoomButton.Click += new System.EventHandler(this.ZoomButton_Click);
-            // 
             // dbPanel1
             // 
             this.dbPanel1.AllowDrop = true;
             this.dbPanel1.BackColor = System.Drawing.SystemColors.GrayText;
+            this.dbPanel1.Controls.Add(this.trackBar1);
             this.dbPanel1.Location = new System.Drawing.Point(0, 45);
             this.dbPanel1.Margin = new System.Windows.Forms.Padding(0);
             this.dbPanel1.Name = "dbPanel1";
@@ -68,15 +60,17 @@
             this.dbPanel1.DragEnter += new System.Windows.Forms.DragEventHandler(this.Main_DragEnter);
             this.dbPanel1.Paint += new System.Windows.Forms.PaintEventHandler(this.Main_Paint);
             // 
-            // ZoomOutButton
+            // trackBar1
             // 
-            this.ZoomOutButton.Location = new System.Drawing.Point(700, 10);
-            this.ZoomOutButton.Name = "ZoomOutButton";
-            this.ZoomOutButton.Size = new System.Drawing.Size(172, 32);
-            this.ZoomOutButton.TabIndex = 3;
-            this.ZoomOutButton.Text = "Zoom Out";
-            this.ZoomOutButton.UseVisualStyleBackColor = true;
-            this.ZoomOutButton.Click += new System.EventHandler(this.ZoomOutButton_Click);
+            this.trackBar1.Enabled = false;
+            this.trackBar1.Location = new System.Drawing.Point(350, 495);
+            this.trackBar1.Maximum = 75;
+            this.trackBar1.Name = "trackBar1";
+            this.trackBar1.Size = new System.Drawing.Size(255, 45);
+            this.trackBar1.TabIndex = 0;
+            this.trackBar1.TabStop = false;
+            this.trackBar1.TickFrequency = 25;
+            this.trackBar1.Scroll += new System.EventHandler(this.trackBar1_Scroll);
             // 
             // MainWindow
             // 
@@ -84,12 +78,13 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.ClientSize = new System.Drawing.Size(994, 585);
-            this.Controls.Add(this.ZoomOutButton);
-            this.Controls.Add(this.ZoomButton);
             this.Controls.Add(this.DrawButton);
             this.Controls.Add(this.dbPanel1);
             this.Name = "MainWindow";
             this.Text = "Map Visualization";
+            this.dbPanel1.ResumeLayout(false);
+            this.dbPanel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -98,8 +93,7 @@
 
         private DBPanel dbPanel1;
         private System.Windows.Forms.Button DrawButton;
-        private System.Windows.Forms.Button ZoomButton;
-        private System.Windows.Forms.Button ZoomOutButton;
+        private System.Windows.Forms.TrackBar trackBar1;
     }
 }
 
