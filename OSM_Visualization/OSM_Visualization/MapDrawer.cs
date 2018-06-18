@@ -15,31 +15,34 @@ namespace OSM_Visualization
     {
         Bitmap bitmap;
         OSMDataManager loader;
-        DBPanel mainPanel;
         Graphics gr;
-        ConcurrentBag<Tuple<float, float,float, float>> bag;
-        ConcurrentBag<Tuple<float, float, float, float>> Transformed;
+        ConcurrentBag<Tuple<float, float, float, float>> linePoints;
+        ConcurrentBag<Tuple<float, float, float, float>> transformedPoints;
 
 
-        public MapDrawer(DBPanel panel, ref Bitmap bit)
+        public MapDrawer(Tuple<int, int> bitmapInfo)
         {
-            mainPanel = panel;
-            bitmap = bit;
+            bitmap = new Bitmap(bitmapInfo.Item1, bitmapInfo.Item2);
+
             gr = Graphics.FromImage(bitmap);
             gr.SmoothingMode = SmoothingMode.AntiAlias;
 
-            bag = new ConcurrentBag<Tuple<float, float, float, float>>();
-            Transformed = new ConcurrentBag<Tuple<float, float, float, float>>();
+            linePoints = new ConcurrentBag<Tuple<float, float, float, float>>();
+            transformedPoints = new ConcurrentBag<Tuple<float, float, float, float>>();
         }
 
-        public void DrawMap(ref OSMDataManager xmlData, int zoomOption)
+        public Bitmap DrawMap(ref OSMDataManager xmlData)
         {
             loader = xmlData;
 
-            if (bag.IsEmpty)
+            if (linePoints.IsEmpty)
                 GetPoints();
 
-            ConnectPoints(zoomOption);
+            TransformPoints();
+            DrawToBitmap();
+            transformedPoints = new ConcurrentBag<Tuple<float, float, float, float>>();
+
+            return bitmap;
         }
 
         private void GetPoints()
@@ -52,50 +55,37 @@ namespace OSM_Visualization
                 float p2Lon = 0;
 
 
-                for(int i = 0; i < way.Count() - 1; i++)
+                for (int i = 0; i < way.Count() - 1; i++)
                 {
                     p1Lat = float.Parse(loader.dict[way[i]].Item1);
-                    p1Lon =float.Parse(loader.dict[way[i]].Item2);
+                    p1Lon = float.Parse(loader.dict[way[i]].Item2);
                     p2Lat = float.Parse(loader.dict[way[i + 1]].Item1);
                     p2Lon = float.Parse(loader.dict[way[i + 1]].Item2);
-                    bag.Add(new Tuple<float, float, float, float>(p1Lat, p1Lon, p2Lat, p2Lon));
+                    linePoints.Add(new Tuple<float, float, float, float>(p1Lat, p1Lon, p2Lat, p2Lon));
                 }
             });
         }
 
         private static readonly Pen myPen = new Pen(Brushes.White, .1f);
 
-        private void ConnectPoints(int zoomOption)
+        private void TransformPoints()
         {
-            if (zoomOption == 1 || zoomOption == 2)
-                loader.ZoomBounds(zoomOption);
-
             int H = bitmap.Height;
             int W = bitmap.Width;
 
-            Parallel.ForEach(bag, x =>
+            Parallel.ForEach(linePoints, x =>
             {
                 if (x.Item1 < loader.maxLat && x.Item1 > loader.minLat &&
                    x.Item2 < loader.maxLon && x.Item2 > loader.minLon &&
                    x.Item3 < loader.maxLat && x.Item3 > loader.minLat &&
-                   x.Item2 < loader.maxLon && x.Item2 > loader.minLon)
+                   x.Item4 < loader.maxLon && x.Item4 > loader.minLon)
                 {
-
-                    Tuple<float, float, float, float> normalizedValues = NormalizeAndRotate(x, H, W);
-
-                    Transformed.Add(new Tuple<float, float, float, float>
-                                    (normalizedValues.Item1, normalizedValues.Item2,
-                                    normalizedValues.Item3, normalizedValues.Item4));
+                    transformedPoints.Add(NormalizeAndRotate(x, H, W));
                 }
             });
-
-            Draw();
-
-            Transformed = new ConcurrentBag<Tuple<float, float, float, float>>();
-
         }
 
-        private Tuple<float,float,float,float> NormalizeAndRotate(Tuple<float, float, float, float> unNormalizedValues, int H, int W)
+        private Tuple<float, float, float, float> NormalizeAndRotate(Tuple<float, float, float, float> unNormalizedValues, int H, int W)
         {
             float normalizedp1Lat;
             float normalizedp2Lon;
@@ -117,20 +107,21 @@ namespace OSM_Visualization
             return (new Tuple<float, float, float, float>(normalizedp2Lon, rotatedp2Lat, normalizedp1Lon, rotatedp1Lat));
         }
 
-        private void Draw()
+        private void DrawToBitmap()
         {
             gr.Clear(Color.Gray);
 
-            foreach (var x in Transformed)
+            foreach (var x in transformedPoints)
+            {
                 gr.DrawLine(myPen, x.Item1, x.Item2, x.Item3, x.Item4);
-
-            mainPanel.Invalidate();
+            }
         }
+
 
         public void Dispose()
         {
-            bag = null;
-            Transformed = null;
+            linePoints = null;
+            transformedPoints = null;
             bitmap = null;
             gr = null;
             loader = null;

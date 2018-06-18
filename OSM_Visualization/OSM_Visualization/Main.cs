@@ -17,6 +17,8 @@ namespace OSM_Visualization
         MapDrawer drawer;
         OSMDataManager xmlData;
 
+        Graphics gr;
+
 
         public MainWindow()
         {
@@ -37,7 +39,7 @@ namespace OSM_Visualization
 
             this.Cursor = Cursors.SizeAll;
 
-           
+
         }
 
         void Main_DragEnter(object sender, DragEventArgs e)
@@ -56,22 +58,8 @@ namespace OSM_Visualization
         void Draw_buttonClick(object sender, EventArgs e)
         {
 
+            LoadingScreen();
             DrawButton.Enabled = false;
-            Font FontDraw = new Font("Arial", 56);
-
-            Graphics gr;
-            gr = Graphics.FromImage(bitmap);
-            gr.SmoothingMode = SmoothingMode.HighQuality;
-            SolidBrush drawBrush = new SolidBrush(Color.White);
-
-            gr.Clear(Color.Gray);
-            dbPanel1.Invalidate();
-
-            gr.DrawString("Loading...", FontDraw, drawBrush, bitmap.Width / 2 - 125, bitmap.Height / 2 - 50);
-
-            dbPanel1.Invalidate();
-
-
             LoadAndDraw();
         }
 
@@ -80,29 +68,53 @@ namespace OSM_Visualization
 
             xmlData = await Task.Run(() => new OSMDataManager(fileLoc));
 
-            drawer = new MapDrawer(dbPanel1, ref bitmap);
+            drawer = new MapDrawer(new Tuple<int, int>(bitmap.Width, bitmap.Height));
 
-            await Task.Run(() => Draw(ref xmlData, drawer));
+            bitmap = new Bitmap (await Task.Run(() => Draw(ref xmlData, drawer)));
 
             //await Task.Run(() => drawer.Dispose());
             //await Task.Run(() => xmlData.Dispose());
 
             GC.Collect();
-            dbPanel1.Invalidate();
+            RefreshScreen();
         }
 
-        void Draw(ref OSMDataManager xmlData, MapDrawer drawer) => drawer.DrawMap(ref xmlData, 0);
+        Bitmap Draw(ref OSMDataManager xmlData, MapDrawer drawer) => drawer.DrawMap(ref xmlData);
 
         private void Main_Paint(object sender, PaintEventArgs e) => e.Graphics.DrawImage(bitmap, Point.Empty);
 
+        Font FontDraw = new Font("Arial", 56);
+        SolidBrush drawBrush = new SolidBrush(Color.White);
+
+        private void LoadingScreen()
+        {
+            gr = Graphics.FromImage(bitmap);
+            gr.SmoothingMode = SmoothingMode.HighQuality;
+            gr.Clear(Color.Gray);
+            gr.DrawString("Loading...", FontDraw, drawBrush, bitmap.Width / 2 - 125, bitmap.Height / 2 - 50);
+            dbPanel1.Refresh();
+        }
+
         private void ZoomButton_Click(object sender, EventArgs e)
         {
-            drawer.DrawMap(ref xmlData, 1);
+            LoadingScreen();
+            xmlData.ZoomBounds(1);
+            bitmap = new Bitmap(drawer.DrawMap(ref xmlData));
+            RefreshScreen();
         }
 
         private void ZoomOutButton_Click(object sender, EventArgs e)
         {
-            drawer.DrawMap(ref xmlData, 2);
+            LoadingScreen();
+            xmlData.ZoomBounds(2);
+            bitmap = new Bitmap(drawer.DrawMap(ref xmlData));
+            RefreshScreen();
         }
+
+        private void RefreshScreen()
+        {
+            dbPanel1.Invalidate();
+        }
+
     }
 }

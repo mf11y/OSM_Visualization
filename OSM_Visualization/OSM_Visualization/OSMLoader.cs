@@ -118,11 +118,14 @@ namespace OSM_Visualization
             }
             else
             {
-                maxLat = latLonZoomHistory.Peek().Item1;
-                minLat = latLonZoomHistory.Peek().Item2;
-                maxLon = latLonZoomHistory.Peek().Item3;
-                minLon = latLonZoomHistory.Peek().Item4;
-                latLonZoomHistory.Pop();
+                if (latLonZoomHistory.Count != 0)
+                {
+                    maxLat = latLonZoomHistory.Peek().Item1;
+                    minLat = latLonZoomHistory.Peek().Item2;
+                    maxLon = latLonZoomHistory.Peek().Item3;
+                    minLon = latLonZoomHistory.Peek().Item4;
+                    latLonZoomHistory.Pop();
+                }
             }
 
         }
