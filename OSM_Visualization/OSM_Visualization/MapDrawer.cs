@@ -32,14 +32,14 @@ namespace OSM_Visualization
             Transformed = new ConcurrentBag<Tuple<float, float, float, float>>();
         }
 
-        public void DrawMap(ref OSMDataManager xmlData, float zoomFactor)
+        public void DrawMap(ref OSMDataManager xmlData, int zoomOption)
         {
             loader = xmlData;
 
-            if(zoomFactor > .9f)
+            if (bag.IsEmpty)
                 GetPoints();
 
-            ConnectPoints(zoomFactor);
+            ConnectPoints(zoomOption);
         }
 
         private void GetPoints()
@@ -65,27 +65,10 @@ namespace OSM_Visualization
 
         private static readonly Pen myPen = new Pen(Brushes.White, .1f);
 
-        private void ConnectPoints(float zoomFactor)
+        private void ConnectPoints(int zoomOption)
         {
-            float diff1 = loader.maxLon - loader.minLon;
-            float diff2 = loader.maxLat - loader.minLat;
-
-            if (zoomFactor < 1f)
-            {
-                gr.Clear(Color.Gray);
-                mainPanel.Invalidate();
-                float zoomed1 = diff2 * zoomFactor;
-                float zoomed2 = diff1 * zoomFactor;
-
-                float sub1 = (diff2 - zoomed1) / 2f ;
-                loader.maxLat -= sub1;
-                loader.minLat += sub1;
-
-                float sub2 = (diff1 - zoomed2) /2f;
-                loader.maxLon -= sub2;
-                loader.minLon += sub2;
-            }
-
+            if (zoomOption == 1 || zoomOption == 2)
+                loader.ZoomBounds(zoomOption);
 
             float H = (float)bitmap.Height;
             float W = (float)bitmap.Width;

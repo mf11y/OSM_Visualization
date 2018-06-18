@@ -31,6 +31,7 @@
             this.DrawButton = new System.Windows.Forms.Button();
             this.ZoomButton = new System.Windows.Forms.Button();
             this.dbPanel1 = new OSM_Visualization.DBPanel();
+            this.ZoomOutButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // DrawButton
@@ -46,7 +47,7 @@
             // 
             // ZoomButton
             // 
-            this.ZoomButton.Location = new System.Drawing.Point(712, 10);
+            this.ZoomButton.Location = new System.Drawing.Point(37, 10);
             this.ZoomButton.Name = "ZoomButton";
             this.ZoomButton.Size = new System.Drawing.Size(172, 32);
             this.ZoomButton.TabIndex = 2;
@@ -67,12 +68,23 @@
             this.dbPanel1.DragEnter += new System.Windows.Forms.DragEventHandler(this.Main_DragEnter);
             this.dbPanel1.Paint += new System.Windows.Forms.PaintEventHandler(this.Main_Paint);
             // 
+            // ZoomOutButton
+            // 
+            this.ZoomOutButton.Location = new System.Drawing.Point(700, 10);
+            this.ZoomOutButton.Name = "ZoomOutButton";
+            this.ZoomOutButton.Size = new System.Drawing.Size(172, 32);
+            this.ZoomOutButton.TabIndex = 3;
+            this.ZoomOutButton.Text = "Zoom Out";
+            this.ZoomOutButton.UseVisualStyleBackColor = true;
+            this.ZoomOutButton.Click += new System.EventHandler(this.ZoomOutButton_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.ClientSize = new System.Drawing.Size(994, 585);
+            this.Controls.Add(this.ZoomOutButton);
             this.Controls.Add(this.ZoomButton);
             this.Controls.Add(this.DrawButton);
             this.Controls.Add(this.dbPanel1);
@@ -87,6 +99,7 @@
         private DBPanel dbPanel1;
         private System.Windows.Forms.Button DrawButton;
         private System.Windows.Forms.Button ZoomButton;
+        private System.Windows.Forms.Button ZoomOutButton;
     }
 }
 

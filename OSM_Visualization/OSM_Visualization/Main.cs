@@ -17,6 +17,8 @@ namespace OSM_Visualization
         MapDrawer drawer;
         OSMDataManager xmlData;
 
+        int timesCalled = 0;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -33,6 +35,9 @@ namespace OSM_Visualization
             dbPanel1.Location = new Point(0, 50);
 
             DrawButton.Location = new Point((bitmap.Width / 2) - DrawButton.Width / 2, 10);
+
+            this.Cursor = Cursors.SizeAll;
+
            
         }
 
@@ -89,14 +94,20 @@ namespace OSM_Visualization
             dbPanel1.Invalidate();
         }
 
-        void Draw(ref OSMDataManager xmlData, MapDrawer drawer) => drawer.DrawMap(ref xmlData, 1f);
+        void Draw(ref OSMDataManager xmlData, MapDrawer drawer) => drawer.DrawMap(ref xmlData, 0);
 
         private void Main_Paint(object sender, PaintEventArgs e) => e.Graphics.DrawImage(bitmap, Point.Empty);
 
         private void ZoomButton_Click(object sender, EventArgs e)
         {
-            
-            drawer.DrawMap(ref xmlData, .75f);
+            timesCalled++;
+
+            drawer.DrawMap(ref xmlData, 1);
+        }
+
+        private void ZoomOutButton_Click(object sender, EventArgs e)
+        {
+            drawer.DrawMap(ref xmlData, 2);
         }
     }
 }

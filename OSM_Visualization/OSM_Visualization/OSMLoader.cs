@@ -13,10 +13,12 @@ namespace OSM_Visualization
 {
     class OSMDataManager : IDisposable
     {
-        public float minLat { get; set; }
-        public float minLon { get; set; }
-        public float maxLat { get; set; }
-        public float maxLon { get; set; }
+        public float minLat { get; private set; }
+        public float minLon { get; private set; }
+        public float maxLat { get; private set; }
+        public float maxLon { get; private set; }
+
+        private Stack<Tuple<float, float, float, float>> latLonZoomHistory;
 
         public ConcurrentDictionary<string, Tuple<string,string>> dict;
         public List<List<string>> waysConnectionInfo { get; private set; }
@@ -30,12 +32,16 @@ namespace OSM_Visualization
             int concurrencyLevel = Environment.ProcessorCount * 2;
             dict = new ConcurrentDictionary<string, Tuple<string, string>>(concurrencyLevel, 2000003);
             waysConnectionInfo = new List<List<string>>();
+            latLonZoomHistory = new Stack<Tuple<float, float, float, float>>();
 
             ParseXML(ref xReader);
 
             xReader.Dispose();
 
         }
+
+
+
         private void ParseXML(ref XmlReader File)
         {
             bool member = false;
@@ -89,6 +95,36 @@ namespace OSM_Visualization
                     }
                 }
             }
+        }
+
+        public void ZoomBounds(int zoomOption)
+        {
+            if (zoomOption == 1)
+            {
+                latLonZoomHistory.Push(new Tuple<float, float, float, float>(maxLat, minLat, maxLon, minLon));
+
+                float zoomFactor = .75f;
+
+                float ogLatDiff = maxLat - minLat;
+                float ogLonDiff = maxLon - minLon;
+
+                float zoomByLat = (ogLatDiff - (ogLatDiff * zoomFactor)) / 2;
+                maxLat -= zoomByLat;
+                minLat += zoomByLat;
+
+                float zoomByLon = (ogLonDiff - (ogLonDiff * zoomFactor)) / 2;
+                maxLon -= zoomByLon;
+                minLon += zoomByLon;
+            }
+            else
+            {
+                maxLat = latLonZoomHistory.Peek().Item1;
+                minLat = latLonZoomHistory.Peek().Item2;
+                maxLon = latLonZoomHistory.Peek().Item3;
+                minLon = latLonZoomHistory.Peek().Item4;
+                latLonZoomHistory.Pop();
+            }
+
         }
 
         public void Dispose()
