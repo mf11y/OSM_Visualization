@@ -30,10 +30,10 @@
         {
             this.DrawButton = new System.Windows.Forms.Button();
             this.dbPanel1 = new OSM_Visualization.DBPanel();
-            this.trackBar1 = new System.Windows.Forms.TrackBar();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.dbPanel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // DrawButton
@@ -52,7 +52,7 @@
             this.dbPanel1.AllowDrop = true;
             this.dbPanel1.BackColor = System.Drawing.SystemColors.GrayText;
             this.dbPanel1.Controls.Add(this.textBox1);
-            this.dbPanel1.Controls.Add(this.trackBar1);
+            this.dbPanel1.Controls.Add(this.pictureBox1);
             this.dbPanel1.Location = new System.Drawing.Point(0, 45);
             this.dbPanel1.Margin = new System.Windows.Forms.Padding(0);
             this.dbPanel1.Name = "dbPanel1";
@@ -60,19 +60,6 @@
             this.dbPanel1.TabIndex = 0;
             this.dbPanel1.DragDrop += new System.Windows.Forms.DragEventHandler(this.Main_DragDrop);
             this.dbPanel1.DragEnter += new System.Windows.Forms.DragEventHandler(this.Main_DragEnter);
-            this.dbPanel1.Paint += new System.Windows.Forms.PaintEventHandler(this.Main_Paint);
-            // 
-            // trackBar1
-            // 
-            this.trackBar1.Enabled = false;
-            this.trackBar1.Location = new System.Drawing.Point(350, 495);
-            this.trackBar1.Maximum = 75;
-            this.trackBar1.Name = "trackBar1";
-            this.trackBar1.Size = new System.Drawing.Size(255, 45);
-            this.trackBar1.TabIndex = 0;
-            this.trackBar1.TabStop = false;
-            this.trackBar1.TickFrequency = 25;
-            this.trackBar1.Scroll += new System.EventHandler(this.trackBar1_Scroll);
             // 
             // textBox1
             // 
@@ -82,11 +69,20 @@
             this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 50F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox1.Location = new System.Drawing.Point(332, 201);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(337, 76);
+            this.textBox1.Size = new System.Drawing.Size(609, 76);
             this.textBox1.TabIndex = 1;
             this.textBox1.Text = "Loading. . .";
             this.textBox1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.textBox1.Visible = false;
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(994, 540);
+            this.pictureBox1.TabIndex = 2;
+            this.pictureBox1.TabStop = false;
+            this.pictureBox1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.PictureBox1_Click);
             // 
             // MainWindow
             // 
@@ -100,7 +96,7 @@
             this.Text = "Map Visualization";
             this.dbPanel1.ResumeLayout(false);
             this.dbPanel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -109,8 +105,8 @@
 
         private DBPanel dbPanel1;
         private System.Windows.Forms.Button DrawButton;
-        private System.Windows.Forms.TrackBar trackBar1;
         private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.PictureBox pictureBox1;
     }
 }
 

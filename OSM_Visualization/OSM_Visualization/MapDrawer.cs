@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.XPath;
+
 
 namespace OSM_Visualization
 {
@@ -66,7 +63,7 @@ namespace OSM_Visualization
             });
         }
 
-        private static readonly Pen myPen = new Pen(Brushes.White, .1f);
+        private static readonly Pen myPen = new Pen(Brushes.White, 2);
 
         private void TransformPoints()
         {

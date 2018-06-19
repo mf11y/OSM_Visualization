@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Xml;
-using System.Xml.Linq;
-using System.Xml.XPath;
+
+
 
 namespace OSM_Visualization
 {
@@ -17,11 +13,6 @@ namespace OSM_Visualization
         public float minLon { get; private set; }
         public float maxLat { get; private set; }
         public float maxLon { get; private set; }
-
-        private float ogMaxLat;
-        private float ogMinLat;
-        private float ogMaxLon;
-        private float ogMinLon;
 
         public ConcurrentDictionary<string, Tuple<string,string>> dict;
         public List<List<string>> waysConnectionInfo { get; private set; }
@@ -55,13 +46,9 @@ namespace OSM_Visualization
                     {
                         case "bounds":
                             minLat = float.Parse(File.GetAttribute("minlat"));
-                            ogMinLat = minLat;
                             minLon = float.Parse(File.GetAttribute("minlon"));
-                            ogMinLon = minLon;
                             maxLat = float.Parse(File.GetAttribute("maxlat"));
-                            ogMaxLat = maxLat;
                             maxLon = float.Parse(File.GetAttribute("maxlon"));
-                            ogMaxLon = maxLon;
                             break;
                         case "way":
                             XmlReader inner = File.ReadSubtree();
@@ -101,28 +88,6 @@ namespace OSM_Visualization
                     }
                 }
             }
-        }
-
-
-        public void ZoomBounds(int trackerPos)
-        {
-            float zoomFactor = (1f - (trackerPos / 100f));
-
-            maxLon = ogMaxLon;
-            minLon = ogMinLon;
-            maxLat = ogMaxLat;
-            minLat = ogMinLat;
-
-            float ogLatDiff = maxLat - minLat;
-            float ogLonDiff = maxLon - minLon;
-
-            float zoomByLat = (ogLatDiff - (ogLatDiff * zoomFactor)) / 2;
-            maxLat -= zoomByLat;
-            minLat += zoomByLat;
-
-            float zoomByLon = (ogLonDiff - (ogLonDiff * zoomFactor)) / 2;
-            maxLon -= zoomByLon;
-            minLon += zoomByLon;
         }
 
         public void Dispose()
