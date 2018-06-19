@@ -2,12 +2,12 @@
 using System.Drawing;
 using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace OSM_Visualization
 {
     public partial class MainWindow : Form
     {
-        Bitmap bitmap;
         string fileLoc;
 
         MapDrawer drawer;
@@ -15,8 +15,11 @@ namespace OSM_Visualization
 
         Bitmap fullSizedBitmap;
         Bitmap mediumSizedBitmap;
+        Bitmap smallSizedBitmap;
+
         Bitmap fullSizedBitmapResize;
         Bitmap mediumSizedBitmapResize;
+        Bitmap smallSizedBitmapResize;
 
 
         public MainWindow()
@@ -28,19 +31,21 @@ namespace OSM_Visualization
             this.Width = Screen.GetWorkingArea(this).Width;
             this.MinimumSize = this.Size;
             this.MaximumSize = this.Size;
-            bitmap = new Bitmap(Screen.GetWorkingArea(this).Width, Screen.GetWorkingArea(this).Height - 50);
 
-            dbPanel1.Width = bitmap.Width;
-            dbPanel1.Height = bitmap.Height;
+
+
+            dbPanel1.Width = Screen.GetWorkingArea(this).Width;
+            dbPanel1.Height = Screen.GetWorkingArea(this).Height - 50;
             dbPanel1.Location = new Point(0, 50);
 
 
 
-            DrawButton.Location = new Point((bitmap.Width / 2) - DrawButton.Width / 2, 10);
-            textBox1.Location = new Point((bitmap.Width / 2) - textBox1.Width / 2, (bitmap.Height / 2) - textBox1.Height);
+            DrawButton.Location = new Point((dbPanel1.Width / 2) - DrawButton.Width / 2, 10);
+            textBox1.Location = new Point((dbPanel1.Width / 2) - textBox1.Width / 2, (dbPanel1.Height / 2) - textBox1.Height);
 
-            bitmap = new Bitmap(Screen.GetWorkingArea(this).Width * 4, (Screen.GetWorkingArea(this).Height - 50) * 4);
+
             pictureBox1.SizeMode = PictureBoxSizeMode.AutoSize;
+
 
         }
 
@@ -61,26 +66,21 @@ namespace OSM_Visualization
         {
 
             textBox1.Visible = true;
-            textBox1.Text = "Loading in Nodes...";
             DrawButton.Enabled = false;
             LoadAndDraw();
         }
 
         async void LoadAndDraw()
         {
-
+            textBox1.Text = "Loading in Nodes...";
             xmlData = await Task.Run(() => new OSMDataManager(fileLoc));
 
-            drawer = new MapDrawer(new Tuple<int, int>(bitmap.Width, bitmap.Height));
-
             textBox1.Text = "Drawing Map...";
-            fullSizedBitmap = new Bitmap (await Task.Run(() => Draw(ref xmlData, drawer)));
+            drawer = new MapDrawer(new Tuple<int, int>(1920 * 4, 1000 * 4));
+            fullSizedBitmap = new Bitmap (await Task.Run(() => drawer.DrawMap(ref xmlData)));
 
             await Task.Run(() => drawer.Dispose());
             await Task.Run(() => xmlData.Dispose());
-
-            xmlData = null;
-            drawer = null;
 
             CreateBitmaps();
 
@@ -92,52 +92,95 @@ namespace OSM_Visualization
 
         private void CreateBitmaps()
         {
-            mediumSizedBitmap = new Bitmap(fullSizedBitmap, 3840, 2160);
-            mediumSizedBitmapResize = new Bitmap(mediumSizedBitmap, 1920, 1080);
-            fullSizedBitmapResize = new Bitmap(fullSizedBitmap, 1920, 1080);
+            mediumSizedBitmap = new Bitmap(fullSizedBitmap, 3840, 2000);
+            mediumSizedBitmapResize = new Bitmap(mediumSizedBitmap, 1920, 1000);
+
+            smallSizedBitmap = new Bitmap(mediumSizedBitmap, 1920, 1000);
+
+
+            fullSizedBitmapResize = new Bitmap(fullSizedBitmap, 1920, 1000);
         }
 
-        Bitmap Draw(ref OSMDataManager xmlData, MapDrawer drawer) => drawer.DrawMap(ref xmlData);
 
         private void RefreshScreen()
         {
-            bitmap = new Bitmap(fullSizedBitmap, 1920, 1080);
-            pictureBox1.Image = bitmap;
+            pictureBox1.Image = fullSizedBitmapResize;
         }
 
         int zoomFactor = 0;
 
+        Stack<Point> Moves = new Stack<Point>();
+
         private void PictureBox1_Click(object sender, MouseEventArgs e)
         {
 
-            int x = pictureBox1.PointToClient(Cursor.Position).X;
-            int y = pictureBox1.PointToClient(Cursor.Position).Y;
+            int x = dbPanel1.PointToClient(Cursor.Position).X;
+            int y = dbPanel1.PointToClient(Cursor.Position).Y;
 
             if(e.Button == MouseButtons.Left)
             {
+                Point incoming = new Point(x / 960, y/500);
                 zoomFactor++;
+
                 if (zoomFactor == 1)
                 {
-                    if (x / 960 == 0)
+                    pictureBox1.Image = mediumSizedBitmap;
+
+                    if (incoming.X == 1 && incoming.Y == 0)
                     {
-                        pictureBox1.Image = mediumSizedBitmap;
+                        pictureBox1.Location = new Point(-1 * (mediumSizedBitmap.Width / 2), 0);
                     }
-                    else if (x / 960 == 1)
+                    else if(incoming.X == 0 && incoming.Y == 1)
                     {
-                        bitmap = mediumSizedBitmap;
-                        pictureBox1.Image = mediumSizedBitmap;
-                        pictureBox1.Location = new Point(-1 * (bitmap.Width / 2), 0);
+                        pictureBox1.Location = new Point(0, -1 * (mediumSizedBitmap.Height/2));
                     }
+                    else if(incoming.X == 1 && incoming.Y == 1)
+                    {
+                        pictureBox1.Location = new Point(-1 * (mediumSizedBitmap.Width / 2), -1 * (mediumSizedBitmap.Height / 2));
+                    }
+
+                    Moves.Push(incoming);
+                }
+                if(zoomFactor == 2)
+                {
+                    Point oldMove = Moves.Peek();
+
+                    Point adjQuad = new Point() ;
+
+                    if(oldMove.X == 0 && oldMove.Y == 0)
+                    {
+                        adjQuad.X = incoming.X;
+                        adjQuad.Y = incoming.Y;
+                    }
+                    if (oldMove.X == 0 && oldMove.Y == 1)
+                    {
+                        adjQuad.X = incoming.X;
+                        adjQuad.Y = incoming.Y + 2;
+
+                    }
+                    if (oldMove.X == 1 && oldMove.Y == 0)
+                    {
+                        adjQuad.X = incoming.X + 2;
+                        adjQuad.Y = incoming.Y;
+                    }
+                    if (oldMove.X == 1 && oldMove.Y == 1)
+                    {
+                        adjQuad.X = incoming.X + 2;
+                        adjQuad.Y = incoming.Y + 2;
+                    }
+
+                    pictureBox1.Image = fullSizedBitmap;
+                    pictureBox1.Location = new Point(-1 * (1920 * adjQuad.X), -1 * (1000 * adjQuad.Y));
                 }
             }
             else
             {
-                if (zoomFactor == 1)
-                {
+
                     pictureBox1.Image = fullSizedBitmapResize;
                     pictureBox1.Location = new Point(0, 0);
-                }
-                zoomFactor--;
+                    zoomFactor = 0; ;
+                    Moves.Pop();
+
             }
         }
     }

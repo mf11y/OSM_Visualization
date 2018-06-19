@@ -32,11 +32,10 @@ namespace OSM_Visualization
         {
             loader = xmlData;
 
-            if (linePoints.IsEmpty)
-                GetPoints();
-
+            GetPoints();
             TransformPoints();
             DrawToBitmap();
+
             transformedPoints = new ConcurrentBag<Tuple<float, float, float, float>>();
 
             return bitmap;
@@ -119,9 +118,10 @@ namespace OSM_Visualization
         {
             linePoints = null;
             transformedPoints = null;
-            bitmap = null;
-            gr = null;
             loader = null;
+            bitmap.Dispose();
+            gr.Dispose();
+            myPen.Dispose();
             GC.SuppressFinalize(this);
         }
     }

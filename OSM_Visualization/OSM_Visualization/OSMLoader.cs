@@ -28,7 +28,6 @@ namespace OSM_Visualization
             waysConnectionInfo = new List<List<string>>();
 
             ParseXML(ref xReader);
-
             xReader.Dispose();
 
         }
