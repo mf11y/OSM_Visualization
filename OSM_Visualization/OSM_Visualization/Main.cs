@@ -130,33 +130,25 @@ namespace OSM_Visualization
                     int xTransformed = 0;
                     int yTransformed = 0;
 
-                    if(incoming.X == 0 && incoming.Y == 0)
-                    {
-
-                    }
-                    else if(incoming.X == 1 && incoming .Y == 0)
-                    {
-                        xTransformed = -1 * (mediumSizedBitmap.Width / 2);
-                    }
-                    else if(incoming.X == 0 && incoming.Y == 1)
-                    {
-                        yTransformed = -1 * (mediumSizedBitmap.Height / 2);
-                    }
-                    else if(incoming.X == 1 && incoming.Y == 1)
-                    {
-                        xTransformed = -1 * (mediumSizedBitmap.Width / 2);
-                        yTransformed = -1 * (mediumSizedBitmap.Height / 2);
-                    }
 
                     if (x > dbPanel1.Width / 4 && x < dbPanel1.Width * .75)
                     {
                         xTransformed = -1 * x * 2;
                         xTransformed += 1920 / 2;
                     }
+                    else
+                    {
+                        xTransformed = -1 * (mediumSizedBitmap.Width / 2);
+                    }
+
                     if (y > dbPanel1.Height / 4 && y < dbPanel1.Height * .75)
                     {
                         yTransformed = -1 * y * 2;
                         yTransformed += 1000 / 2;
+                    }
+                    else
+                    {
+                        yTransformed = -1 * (mediumSizedBitmap.Height / 2);
                     }
 
                     pictureBox1.Location = new Point(xTransformed, yTransformed);
