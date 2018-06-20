@@ -23,6 +23,9 @@ namespace OSM_Visualization
 
             gr = Graphics.FromImage(bitmap);
             gr.SmoothingMode = SmoothingMode.AntiAlias;
+            //gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            //gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
+            //gr.CompositingQuality = CompositingQuality.HighQuality;
 
             linePoints = new ConcurrentBag<Tuple<float, float, float, float>>();
             transformedPoints = new ConcurrentBag<Tuple<float, float, float, float>>();
@@ -61,8 +64,6 @@ namespace OSM_Visualization
                 }
             });
         }
-
-        private static readonly Pen myPen = new Pen(Brushes.White, 2);
 
         private void TransformPoints()
         {
@@ -103,9 +104,11 @@ namespace OSM_Visualization
             return (new Tuple<float, float, float, float>(normalizedp2Lon, rotatedp2Lat, normalizedp1Lon, rotatedp1Lat));
         }
 
+        private static readonly Pen myPen = new Pen(Brushes.White, 3);
+
         private void DrawToBitmap()
         {
-            gr.Clear(Color.Gray);
+            gr.Clear(Color.Black);
 
             foreach (var x in transformedPoints)
             {

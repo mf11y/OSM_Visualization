@@ -50,7 +50,7 @@
             // dbPanel1
             // 
             this.dbPanel1.AllowDrop = true;
-            this.dbPanel1.BackColor = System.Drawing.SystemColors.GrayText;
+            this.dbPanel1.BackColor = System.Drawing.SystemColors.Desktop;
             this.dbPanel1.Controls.Add(this.textBox1);
             this.dbPanel1.Controls.Add(this.pictureBox1);
             this.dbPanel1.Location = new System.Drawing.Point(0, 45);
@@ -63,10 +63,11 @@
             // 
             // textBox1
             // 
-            this.textBox1.BackColor = System.Drawing.SystemColors.GrayText;
+            this.textBox1.BackColor = System.Drawing.SystemColors.Desktop;
             this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox1.Enabled = false;
             this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 50F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox1.ForeColor = System.Drawing.SystemColors.Window;
             this.textBox1.Location = new System.Drawing.Point(332, 201);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(609, 76);
@@ -77,6 +78,7 @@
             // 
             // pictureBox1
             // 
+            this.pictureBox1.BackColor = System.Drawing.SystemColors.Desktop;
             this.pictureBox1.Location = new System.Drawing.Point(0, 0);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(994, 540);

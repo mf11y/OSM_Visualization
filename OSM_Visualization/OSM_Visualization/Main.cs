@@ -104,12 +104,13 @@ namespace OSM_Visualization
 
         private void RefreshScreen()
         {
-            pictureBox1.Image = fullSizedBitmapResize;
+            pictureBox1.Image = mediumSizedBitmapResize;
+            //pictureBox1.Image = fullSizedBitmapResize;
         }
 
         int zoomFactor = 0;
 
-        Stack<Point> Moves = new Stack<Point>();
+        //Stack<Point> Moves = new Stack<Point>();
 
         private void PictureBox1_Click(object sender, MouseEventArgs e)
         {
@@ -120,28 +121,50 @@ namespace OSM_Visualization
             if(e.Button == MouseButtons.Left)
             {
                 Point incoming = new Point(x / 960, y/500);
-                zoomFactor++;
+                zoomFactor = 1;
 
                 if (zoomFactor == 1)
                 {
                     pictureBox1.Image = mediumSizedBitmap;
 
-                    if (incoming.X == 1 && incoming.Y == 0)
+                    int xTransformed = 0;
+                    int yTransformed = 0;
+
+                    if(incoming.X == 0 && incoming.Y == 0)
                     {
-                        pictureBox1.Location = new Point(-1 * (mediumSizedBitmap.Width / 2), 0);
+
+                    }
+                    else if(incoming.X == 1 && incoming .Y == 0)
+                    {
+                        xTransformed = -1 * (mediumSizedBitmap.Width / 2);
                     }
                     else if(incoming.X == 0 && incoming.Y == 1)
                     {
-                        pictureBox1.Location = new Point(0, -1 * (mediumSizedBitmap.Height/2));
+                        yTransformed = -1 * (mediumSizedBitmap.Height / 2);
                     }
                     else if(incoming.X == 1 && incoming.Y == 1)
                     {
-                        pictureBox1.Location = new Point(-1 * (mediumSizedBitmap.Width / 2), -1 * (mediumSizedBitmap.Height / 2));
+                        xTransformed = -1 * (mediumSizedBitmap.Width / 2);
+                        yTransformed = -1 * (mediumSizedBitmap.Height / 2);
                     }
 
-                    Moves.Push(incoming);
+                    if (x > dbPanel1.Width / 4 && x < dbPanel1.Width * .75)
+                    {
+                        xTransformed = -1 * x * 2;
+                        xTransformed += 1920 / 2;
+                    }
+                    if (y > dbPanel1.Height / 4 && y < dbPanel1.Height * .75)
+                    {
+                        yTransformed = -1 * y * 2;
+                        yTransformed += 1000 / 2;
+                    }
+
+                    pictureBox1.Location = new Point(xTransformed, yTransformed);
+
+
+                    //Moves.Push(incoming);
                 }
-                if(zoomFactor == 2)
+                /*if(zoomFactor == 2)
                 {
                     Point oldMove = Moves.Peek();
 
@@ -171,15 +194,15 @@ namespace OSM_Visualization
 
                     pictureBox1.Image = fullSizedBitmap;
                     pictureBox1.Location = new Point(-1 * (1920 * adjQuad.X), -1 * (1000 * adjQuad.Y));
-                }
+                }*/
             }
             else
             {
 
-                    pictureBox1.Image = fullSizedBitmapResize;
+                    pictureBox1.Image = mediumSizedBitmapResize;
                     pictureBox1.Location = new Point(0, 0);
-                    zoomFactor = 0; ;
-                    Moves.Pop();
+                    zoomFactor = 0;
+                    //Moves.Pop();
 
             }
         }
