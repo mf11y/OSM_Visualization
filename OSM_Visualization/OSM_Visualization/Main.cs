@@ -37,7 +37,6 @@ namespace OSM_Visualization
 
             pictureBox1.SizeMode = PictureBoxSizeMode.AutoSize;
 
-
         }
 
         void Main_DragEnter(object sender, DragEventArgs e)
@@ -66,7 +65,7 @@ namespace OSM_Visualization
             xmlData = await Task.Run(() => new OSMDataManager(fileLoc));
 
             textBox1.Text = "Drawing Map...";
-            drawer = new MapDrawer(new Tuple<int, int>(1920 * 4, 1000 * 4));
+            drawer = new MapDrawer(new Tuple<int, int>(dbPanel1.Width * 4, dbPanel1.Height * 4));
             fullSizedBitmap = new Bitmap (await Task.Run(() => drawer.DrawMap(ref xmlData)));
 
             await Task.Run(() => drawer.Dispose());
@@ -82,8 +81,8 @@ namespace OSM_Visualization
 
         private void CreateBitmaps()
         {
-            mediumSizedBitmap = new Bitmap(fullSizedBitmap, 3840, 2000);
-            fullSizedBitmapResize = new Bitmap(fullSizedBitmap, 1920, 1000);
+            mediumSizedBitmap = new Bitmap(fullSizedBitmap, dbPanel1.Width*2, dbPanel1.Height*2);
+            fullSizedBitmapResize = new Bitmap(fullSizedBitmap, dbPanel1.Width, dbPanel1.Height);
         }
 
 
@@ -98,7 +97,7 @@ namespace OSM_Visualization
         }
 
         int zoomFactor = 0;
-        int zoomLimit = 2;
+        const int zoomLimit = 2;
 
         Stack<Tuple<float, float>> Moves = new Stack<Tuple<float, float>>();
 
@@ -127,7 +126,7 @@ namespace OSM_Visualization
                         if (x > dbPanel1.Width / 4 && x < dbPanel1.Width * .75)
                         {
                             xTransformed = -1 * x * 2;
-                            xTransformed += 1920 / 2;
+                            xTransformed += dbPanel1.Width / 2;
                             pointClickedX = x;
                         }
                         else if (x > dbPanel1.Width * .75)
@@ -143,7 +142,7 @@ namespace OSM_Visualization
                         if (y > dbPanel1.Height / 4 && y < dbPanel1.Height * .75)
                         {
                             yTransformed = -1 * y * 2;
-                            yTransformed += 1000 / 2;
+                            yTransformed += dbPanel1.Height / 2;
                             pointClickedY = y;
                         }
                         else if (y > dbPanel1.Height * .75)
@@ -168,9 +167,9 @@ namespace OSM_Visualization
                         int realClickY = y * 2;
 
                         xTransformed = -1 * realClickX;
-                        xTransformed += 1920 / 2;
+                        xTransformed += dbPanel1.Width / 2;
                         yTransformed = -1 * realClickY;
-                        yTransformed += 1000 / 2;
+                        yTransformed += dbPanel1.Height / 2;
 
                         pictureBox1.Location = new Point(xTransformed, yTransformed);
 
@@ -190,11 +189,11 @@ namespace OSM_Visualization
                 {
                     pictureBox1.Image = mediumSizedBitmap;
 
-                    int x = (pictureBox1.Location.X - (1920/2)) / 2;
-                    int y = (pictureBox1.Location.Y - (1000/2)) / 2;
+                    int x = (pictureBox1.Location.X - (dbPanel1.Width/2)) / 2;
+                    int y = (pictureBox1.Location.Y - (dbPanel1.Height/2)) / 2;
 
-                    x += 1920 / 2;
-                    y += 1000 / 2;
+                    x += dbPanel1.Width / 2;
+                    y += dbPanel1.Height / 2;
 
                     pictureBox1.Location = new Point(x, y);
                     zoomFactor--;
@@ -216,14 +215,21 @@ namespace OSM_Visualization
 
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
-            if(mouseDown && zoomFactor!= 0)
+            if(mouseDown && zoomFactor!= 0 )
             {
                 int x, y;
 
                 x = pictureBox1.Location.X - (mouseDownPoint.X - e.X);
                 y = pictureBox1.Location.Y - (mouseDownPoint.Y - e.Y);
 
-                pictureBox1.Location = new Point(x, y);
+                if (!(x < 0 && x > pictureBox1.Width * -1 + 1920))
+                    x = pictureBox1.Location.X;
+
+                if (!(y < 0 && y > pictureBox1.Height * -1 + 1000))
+                    y = pictureBox1.Location.Y;
+
+               pictureBox1.Location = new Point(x, y);
+
             }
         }
 

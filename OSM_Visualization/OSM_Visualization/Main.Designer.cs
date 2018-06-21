@@ -32,8 +32,6 @@
             this.dbPanel1 = new OSM_Visualization.DBPanel();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.textBox3 = new System.Windows.Forms.TextBox();
             this.dbPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -92,28 +90,12 @@
             this.pictureBox1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseUp);
             this.pictureBox1.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseWheel);
             // 
-            // textBox2
-            // 
-            this.textBox2.Location = new System.Drawing.Point(13, 10);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(100, 20);
-            this.textBox2.TabIndex = 2;
-            // 
-            // textBox3
-            // 
-            this.textBox3.Location = new System.Drawing.Point(159, 10);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(100, 20);
-            this.textBox3.TabIndex = 3;
-            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.ClientSize = new System.Drawing.Size(994, 585);
-            this.Controls.Add(this.textBox3);
-            this.Controls.Add(this.textBox2);
             this.Controls.Add(this.DrawButton);
             this.Controls.Add(this.dbPanel1);
             this.Name = "MainWindow";
@@ -122,7 +104,6 @@
             this.dbPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -132,8 +113,6 @@
         private System.Windows.Forms.Button DrawButton;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.TextBox textBox2;
-        private System.Windows.Forms.TextBox textBox3;
     }
 }
 
