@@ -15,11 +15,7 @@ namespace OSM_Visualization
 
         Bitmap fullSizedBitmap;
         Bitmap mediumSizedBitmap;
-        Bitmap smallSizedBitmap;
-
         Bitmap fullSizedBitmapResize;
-        Bitmap mediumSizedBitmapResize;
-        Bitmap smallSizedBitmapResize;
 
 
         public MainWindow()
@@ -32,18 +28,12 @@ namespace OSM_Visualization
             this.MinimumSize = this.Size;
             this.MaximumSize = this.Size;
 
-
-
             dbPanel1.Width = Screen.GetWorkingArea(this).Width;
             dbPanel1.Height = Screen.GetWorkingArea(this).Height - 50;
             dbPanel1.Location = new Point(0, 50);
 
-
-
             DrawButton.Location = new Point((dbPanel1.Width / 2) - DrawButton.Width / 2, 10);
             textBox1.Location = new Point((dbPanel1.Width / 2) - textBox1.Width / 2, (dbPanel1.Height / 2) - textBox1.Height);
-
-
 
             pictureBox1.SizeMode = PictureBoxSizeMode.AutoSize;
 
@@ -65,7 +55,6 @@ namespace OSM_Visualization
 
         void Draw_buttonClick(object sender, EventArgs e)
         {
-
             textBox1.Visible = true;
             DrawButton.Enabled = false;
             LoadAndDraw();
@@ -94,19 +83,13 @@ namespace OSM_Visualization
         private void CreateBitmaps()
         {
             mediumSizedBitmap = new Bitmap(fullSizedBitmap, 3840, 2000);
-            mediumSizedBitmapResize = new Bitmap(mediumSizedBitmap, 1920, 1000);
-
-            smallSizedBitmap = new Bitmap(mediumSizedBitmap, 1920, 1000);
-
-
             fullSizedBitmapResize = new Bitmap(fullSizedBitmap, 1920, 1000);
         }
 
 
         private void RefreshScreen()
         {
-            pictureBox1.Image = mediumSizedBitmapResize;
-            //pictureBox1.Image = fullSizedBitmapResize;
+            pictureBox1.Image = fullSizedBitmapResize;
         }
 
         private void pictureBox1_MouseHover(object sender, EventArgs e)
@@ -115,92 +98,107 @@ namespace OSM_Visualization
         }
 
         int zoomFactor = 0;
+        int zoomLimit = 2;
 
         Stack<Tuple<float, float>> Moves = new Stack<Tuple<float, float>>();
 
         private void pictureBox1_MouseWheel(object sender, MouseEventArgs e)
         {
-            if(e.Delta > 0)
+            if (e.Delta > 0)
             {
-                int x = e.X;
-                int y = e.Y;
-
-                Point incoming = new Point(x, y);
-                zoomFactor++;
-
-                int xTransformed = 0;
-                int yTransformed = 0;
-
-                float pointClickedX = 0;
-                float pointClickedY = 0;
-
-                if (zoomFactor == 1)
+                if (zoomFactor < zoomLimit)
                 {
-                    pictureBox1.Image = mediumSizedBitmap;
+                    int x = e.X;
+                    int y = e.Y;
 
-
-                    if (x > dbPanel1.Width / 4 && x < dbPanel1.Width * .75)
-                    {
-                        xTransformed = -1 * x * 2;
-                        xTransformed += 1920 / 2;
-                        pointClickedX = x;
-                    }
-                    else if (x > dbPanel1.Width * .75)
-                    {
-                        xTransformed = -1 * (mediumSizedBitmap.Width / 2);
-                        pointClickedX = dbPanel1.Width * .75f;
-                    }
-                    else
-                    {
-                        pointClickedX = dbPanel1.Width / 4;
-                    }
-
-                    if (y > dbPanel1.Height / 4 && y < dbPanel1.Height * .75)
-                    {
-                        yTransformed = -1 * y * 2;
-                        yTransformed += 1000 / 2;
-                        pointClickedY = y;
-                    }
-                    else if (y > dbPanel1.Height * .75)
-                    {
-                        yTransformed = -1 * (mediumSizedBitmap.Height / 2);
-                        pointClickedY = dbPanel1.Height * .75f;
-                    }
-                    else
-                    {
-                        pointClickedY = dbPanel1.Height / 4;
-                    }
-
-                    pictureBox1.Location = new Point(xTransformed, yTransformed);
-
-                    Moves.Push(new Tuple<float, float>(pointClickedX, pointClickedY));
-                }
-                if (zoomFactor == 2)
-                {
-                    pictureBox1.Image = fullSizedBitmap;
-
-                    int realClickX = x * 2;
-                    int realClickY = y * 2;
-
-
-
-                    xTransformed = -1 * realClickX;
-                    xTransformed += 1920 / 2;
-                    yTransformed = -1 * realClickY;
-                    yTransformed += 1000 / 2;
-
+                    Point incoming = new Point(x, y);
                     zoomFactor++;
 
+                    int xTransformed = 0;
+                    int yTransformed = 0;
 
-                    pictureBox1.Location = new Point(xTransformed, yTransformed);
+                    float pointClickedX = 0;
+                    float pointClickedY = 0;
+
+                    if (zoomFactor == 1)
+                    {
+                        pictureBox1.Image = mediumSizedBitmap;
+
+                        if (x > dbPanel1.Width / 4 && x < dbPanel1.Width * .75)
+                        {
+                            xTransformed = -1 * x * 2;
+                            xTransformed += 1920 / 2;
+                            pointClickedX = x;
+                        }
+                        else if (x > dbPanel1.Width * .75)
+                        {
+                            xTransformed = -1 * (mediumSizedBitmap.Width / 2);
+                            pointClickedX = dbPanel1.Width * .75f;
+                        }
+                        else
+                        {
+                            pointClickedX = dbPanel1.Width / 4;
+                        }
+
+                        if (y > dbPanel1.Height / 4 && y < dbPanel1.Height * .75)
+                        {
+                            yTransformed = -1 * y * 2;
+                            yTransformed += 1000 / 2;
+                            pointClickedY = y;
+                        }
+                        else if (y > dbPanel1.Height * .75)
+                        {
+                            yTransformed = -1 * (mediumSizedBitmap.Height / 2);
+                            pointClickedY = dbPanel1.Height * .75f;
+                        }
+                        else
+                        {
+                            pointClickedY = dbPanel1.Height / 4;
+                        }
+
+                        pictureBox1.Location = new Point(xTransformed, yTransformed);
+
+                        Moves.Push(new Tuple<float, float>(pointClickedX, pointClickedY));
+                    }
+                    if (zoomFactor == 2)
+                    {
+                        pictureBox1.Image = fullSizedBitmap;
+
+                        int realClickX = x * 2;
+                        int realClickY = y * 2;
+
+                        xTransformed = -1 * realClickX;
+                        xTransformed += 1920 / 2;
+                        yTransformed = -1 * realClickY;
+                        yTransformed += 1000 / 2;
+
+                        pictureBox1.Location = new Point(xTransformed, yTransformed);
+
+                        Moves.Push(new Tuple<float, float>(x, y));
+                    }
                 }
             }
             else
             {
-                pictureBox1.Image = mediumSizedBitmapResize;
-                pictureBox1.Location = new Point(0, 0);
-                zoomFactor = 0;
-                //Moves.Pop();
+                if(zoomFactor == 1)
+                {
+                    pictureBox1.Image = fullSizedBitmapResize;
+                    pictureBox1.Location = new Point(0, 0);
+                    zoomFactor--;
+                }
+                else if(zoomFactor == 2)
+                {
+                    pictureBox1.Image = mediumSizedBitmap;
+
+                    int x = (pictureBox1.Location.X - (1920/2)) / 2;
+                    int y = (pictureBox1.Location.Y - (1000/2)) / 2;
+
+                    x += 1920 / 2;
+                    y += 1000 / 2;
+
+                    pictureBox1.Location = new Point(x, y);
+                    zoomFactor--;
+                }
             }
         }
 
@@ -211,53 +209,21 @@ namespace OSM_Visualization
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
         {
             mouseDown = true;
-
             mouseDownPoint.X = e.X;
             mouseDownPoint.Y = e.Y;
         }
 
-        Point prevMouseDown = new Point(0 , 0);
 
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
-            if(mouseDown)
+            if(mouseDown && zoomFactor!= 0)
             {
                 int x, y;
 
-                //textBox2.Text = e.X.ToString();
-                //textBox3.Text = e.Y.ToString();
-
-                if (e.X > prevMouseDown.X)
-                {
-                    x = pictureBox1.Location.X + (Math.Abs(mouseDownPoint.X - e.X));
-                }
-                else if (e.X < prevMouseDown.X)
-                {
-                    x = pictureBox1.Location.X - (Math.Abs(mouseDownPoint.X - e.X));
-                }
-                else
-                {
-                    x = pictureBox1.Location.X;
-                }
-
-
-                if (e.Y > prevMouseDown.Y)
-                {
-                    y = pictureBox1.Location.Y + (Math.Abs(mouseDownPoint.Y - e.Y));
-                }
-                else if (e.Y < prevMouseDown.Y)
-                {
-                    y = pictureBox1.Location.Y - (Math.Abs(mouseDownPoint.Y - e.Y));
-                }
-                else
-                {
-                    y = pictureBox1.Location.Y;
-                }
+                x = pictureBox1.Location.X - (mouseDownPoint.X - e.X);
+                y = pictureBox1.Location.Y - (mouseDownPoint.Y - e.Y);
 
                 pictureBox1.Location = new Point(x, y);
-
-                prevMouseDown.X = e.X;
-                prevMouseDown.Y = e.Y;
             }
         }
 
