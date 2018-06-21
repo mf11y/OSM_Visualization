@@ -72,13 +72,9 @@ namespace OSM_Visualization
 
             Parallel.ForEach(linePoints, x =>
             {
-                if (x.Item1 < loader.maxLat && x.Item1 > loader.minLat &&
-                   x.Item2 < loader.maxLon && x.Item2 > loader.minLon &&
-                   x.Item3 < loader.maxLat && x.Item3 > loader.minLat &&
-                   x.Item4 < loader.maxLon && x.Item4 > loader.minLon)
-                {
-                    transformedPoints.Add(NormalizeAndRotate(x, H, W));
-                }
+
+                transformedPoints.Add(NormalizeAndRotate(x, H, W));
+
             });
         }
 
@@ -104,7 +100,7 @@ namespace OSM_Visualization
             return (new Tuple<float, float, float, float>(normalizedp2Lon, rotatedp2Lat, normalizedp1Lon, rotatedp1Lat));
         }
 
-        private static readonly Pen myPen = new Pen(Brushes.White, 3);
+        private static readonly Pen myPen = new Pen(Brushes.White, 2);
 
         private void DrawToBitmap()
         {

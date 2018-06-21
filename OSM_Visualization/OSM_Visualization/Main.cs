@@ -44,6 +44,7 @@ namespace OSM_Visualization
             textBox1.Location = new Point((dbPanel1.Width / 2) - textBox1.Width / 2, (dbPanel1.Height / 2) - textBox1.Height);
 
 
+
             pictureBox1.SizeMode = PictureBoxSizeMode.AutoSize;
 
 
@@ -108,95 +109,161 @@ namespace OSM_Visualization
             //pictureBox1.Image = fullSizedBitmapResize;
         }
 
+        private void pictureBox1_MouseHover(object sender, EventArgs e)
+        {
+            pictureBox1.Focus();
+        }
+
         int zoomFactor = 0;
 
-        //Stack<Point> Moves = new Stack<Point>();
+        Stack<Tuple<float, float>> Moves = new Stack<Tuple<float, float>>();
 
-        private void PictureBox1_Click(object sender, MouseEventArgs e)
+        private void pictureBox1_MouseWheel(object sender, MouseEventArgs e)
         {
-
-            int x = dbPanel1.PointToClient(Cursor.Position).X;
-            int y = dbPanel1.PointToClient(Cursor.Position).Y;
-
-            if(e.Button == MouseButtons.Left)
+            if(e.Delta > 0)
             {
-                Point incoming = new Point(x / 960, y/500);
-                zoomFactor = 1;
+                int x = e.X;
+                int y = e.Y;
+
+                Point incoming = new Point(x, y);
+                zoomFactor++;
+
+                int xTransformed = 0;
+                int yTransformed = 0;
+
+                float pointClickedX = 0;
+                float pointClickedY = 0;
 
                 if (zoomFactor == 1)
                 {
                     pictureBox1.Image = mediumSizedBitmap;
-
-                    int xTransformed = 0;
-                    int yTransformed = 0;
 
 
                     if (x > dbPanel1.Width / 4 && x < dbPanel1.Width * .75)
                     {
                         xTransformed = -1 * x * 2;
                         xTransformed += 1920 / 2;
+                        pointClickedX = x;
+                    }
+                    else if (x > dbPanel1.Width * .75)
+                    {
+                        xTransformed = -1 * (mediumSizedBitmap.Width / 2);
+                        pointClickedX = dbPanel1.Width * .75f;
                     }
                     else
                     {
-                        xTransformed = -1 * (mediumSizedBitmap.Width / 2);
+                        pointClickedX = dbPanel1.Width / 4;
                     }
 
                     if (y > dbPanel1.Height / 4 && y < dbPanel1.Height * .75)
                     {
                         yTransformed = -1 * y * 2;
                         yTransformed += 1000 / 2;
+                        pointClickedY = y;
+                    }
+                    else if (y > dbPanel1.Height * .75)
+                    {
+                        yTransformed = -1 * (mediumSizedBitmap.Height / 2);
+                        pointClickedY = dbPanel1.Height * .75f;
                     }
                     else
                     {
-                        yTransformed = -1 * (mediumSizedBitmap.Height / 2);
+                        pointClickedY = dbPanel1.Height / 4;
                     }
 
                     pictureBox1.Location = new Point(xTransformed, yTransformed);
 
-
-                    //Moves.Push(incoming);
+                    Moves.Push(new Tuple<float, float>(pointClickedX, pointClickedY));
                 }
-                /*if(zoomFactor == 2)
+                if (zoomFactor == 2)
                 {
-                    Point oldMove = Moves.Peek();
-
-                    Point adjQuad = new Point() ;
-
-                    if(oldMove.X == 0 && oldMove.Y == 0)
-                    {
-                        adjQuad.X = incoming.X;
-                        adjQuad.Y = incoming.Y;
-                    }
-                    if (oldMove.X == 0 && oldMove.Y == 1)
-                    {
-                        adjQuad.X = incoming.X;
-                        adjQuad.Y = incoming.Y + 2;
-
-                    }
-                    if (oldMove.X == 1 && oldMove.Y == 0)
-                    {
-                        adjQuad.X = incoming.X + 2;
-                        adjQuad.Y = incoming.Y;
-                    }
-                    if (oldMove.X == 1 && oldMove.Y == 1)
-                    {
-                        adjQuad.X = incoming.X + 2;
-                        adjQuad.Y = incoming.Y + 2;
-                    }
-
                     pictureBox1.Image = fullSizedBitmap;
-                    pictureBox1.Location = new Point(-1 * (1920 * adjQuad.X), -1 * (1000 * adjQuad.Y));
-                }*/
+
+                    int realClickX = x * 2;
+                    int realClickY = y * 2;
+
+
+
+                    xTransformed = -1 * realClickX;
+                    xTransformed += 1920 / 2;
+                    yTransformed = -1 * realClickY;
+                    yTransformed += 1000 / 2;
+
+                    zoomFactor++;
+
+
+                    pictureBox1.Location = new Point(xTransformed, yTransformed);
+                }
             }
             else
             {
-
-                    pictureBox1.Image = mediumSizedBitmapResize;
-                    pictureBox1.Location = new Point(0, 0);
-                    zoomFactor = 0;
-                    //Moves.Pop();
-
+                pictureBox1.Image = mediumSizedBitmapResize;
+                pictureBox1.Location = new Point(0, 0);
+                zoomFactor = 0;
+                //Moves.Pop();
             }
+        }
+
+        bool mouseDown;
+
+        Point mouseDownPoint = new Point();
+
+        private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
+        {
+            mouseDown = true;
+
+            mouseDownPoint.X = e.X;
+            mouseDownPoint.Y = e.Y;
+        }
+
+        Point prevMouseDown = new Point(0 , 0);
+
+        private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
+        {
+            if(mouseDown)
+            {
+                int x, y;
+
+                //textBox2.Text = e.X.ToString();
+                //textBox3.Text = e.Y.ToString();
+
+                if (e.X > prevMouseDown.X)
+                {
+                    x = pictureBox1.Location.X + (Math.Abs(mouseDownPoint.X - e.X));
+                }
+                else if (e.X < prevMouseDown.X)
+                {
+                    x = pictureBox1.Location.X - (Math.Abs(mouseDownPoint.X - e.X));
+                }
+                else
+                {
+                    x = pictureBox1.Location.X;
+                }
+
+
+                if (e.Y > prevMouseDown.Y)
+                {
+                    y = pictureBox1.Location.Y + (Math.Abs(mouseDownPoint.Y - e.Y));
+                }
+                else if (e.Y < prevMouseDown.Y)
+                {
+                    y = pictureBox1.Location.Y - (Math.Abs(mouseDownPoint.Y - e.Y));
+                }
+                else
+                {
+                    y = pictureBox1.Location.Y;
+                }
+
+                pictureBox1.Location = new Point(x, y);
+
+                prevMouseDown.X = e.X;
+                prevMouseDown.Y = e.Y;
+            }
+        }
+
+        private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
+        {
+            mouseDown = false;
         }
     }
 }
