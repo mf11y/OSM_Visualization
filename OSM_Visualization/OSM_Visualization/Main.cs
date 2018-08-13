@@ -21,6 +21,7 @@ namespace OSM_Visualization
         public MainWindow()
         {
             InitializeComponent();
+
             this.WindowState = FormWindowState.Maximized;
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.Height = Screen.GetWorkingArea(this).Height;
@@ -137,17 +138,16 @@ namespace OSM_Visualization
                     yTransformed = y * 2;
                     yTransformed -= dbPanel1.Height / 2;
 
-                    if (xTransformed < 0)
-                        xTransformed = 0;
 
                     if (xTransformed + (dbPanel1.Width / 2) > zoomWidth - dbPanel1.Width / 2)
                         xTransformed = zoomWidth - dbPanel1.Width;
-
-                    if(yTransformed < 0)
-                        yTransformed = 0;
+                    else if (xTransformed < 0)
+                        xTransformed = 0;
 
                     if (yTransformed + (dbPanel1.Height / 2) > zoomHeight - dbPanel1.Height / 2)
                         yTransformed = zoomHeight - dbPanel1.Height;
+                    else if (yTransformed < 0)
+                        yTransformed = 0;
 
                     pictureBox1.Location = new Point(-1 * xTransformed, -1 * yTransformed);
                 }
@@ -169,6 +169,16 @@ namespace OSM_Visualization
 
                     x += dbPanel1.Width / 2;
                     y += dbPanel1.Height / 2;
+
+                    if (x - dbPanel1.Width < -1 * mediumSizedBitmap.Width)
+                        x = (mediumSizedBitmap.Width - dbPanel1.Width) * -1;
+                    else if (x > 0)
+                        x = 0;
+
+                    if (y - dbPanel1.Height < -1 * mediumSizedBitmap.Height)
+                        y = (mediumSizedBitmap.Height - dbPanel1.Height) * -1;
+                    else if (y > 0)
+                        y = 0;
 
                     pictureBox1.Location = new Point(x, y);
                     zoomFactor--;
@@ -200,7 +210,7 @@ namespace OSM_Visualization
                 if (!(x < 0 && x > pictureBox1.Width * -1 + 1920))
                     x = pictureBox1.Location.X;
 
-                if (!(y < 0 && y > pictureBox1.Height * -1 + 1000))
+                if (!(y < 0 && y > pictureBox1.Height * -1 + 1080))
                     y = pictureBox1.Location.Y;
 
                pictureBox1.Location = new Point(x, y);
