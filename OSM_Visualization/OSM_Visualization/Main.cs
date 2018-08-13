@@ -99,8 +99,6 @@ namespace OSM_Visualization
         int zoomFactor = 0;
         const int zoomLimit = 2;
 
-        Stack<Tuple<float, float>> Moves = new Stack<Tuple<float, float>>();
-
         private void pictureBox1_MouseWheel(object sender, MouseEventArgs e)
         {
             if (e.Delta > 0)
@@ -116,65 +114,42 @@ namespace OSM_Visualization
                     int xTransformed = 0;
                     int yTransformed = 0;
 
-                    float pointClickedX = 0;
-                    float pointClickedY = 0;
+                    int zoomWidth;
+                    int zoomHeight;
+
 
                     if (zoomFactor == 1)
                     {
                         pictureBox1.Image = mediumSizedBitmap;
-
-                        if (x > dbPanel1.Width / 4 && x < dbPanel1.Width * .75)
-                        {
-                            xTransformed = -1 * x * 2;
-                            xTransformed += dbPanel1.Width / 2;
-                            pointClickedX = x;
-                        }
-                        else if (x > dbPanel1.Width * .75)
-                        {
-                            xTransformed = -1 * (mediumSizedBitmap.Width / 2);
-                            pointClickedX = dbPanel1.Width * .75f;
-                        }
-                        else
-                        {
-                            pointClickedX = dbPanel1.Width / 4;
-                        }
-
-                        if (y > dbPanel1.Height / 4 && y < dbPanel1.Height * .75)
-                        {
-                            yTransformed = -1 * y * 2;
-                            yTransformed += dbPanel1.Height / 2;
-                            pointClickedY = y;
-                        }
-                        else if (y > dbPanel1.Height * .75)
-                        {
-                            yTransformed = -1 * (mediumSizedBitmap.Height / 2);
-                            pointClickedY = dbPanel1.Height * .75f;
-                        }
-                        else
-                        {
-                            pointClickedY = dbPanel1.Height / 4;
-                        }
-
-                        pictureBox1.Location = new Point(xTransformed, yTransformed);
-
-                        Moves.Push(new Tuple<float, float>(pointClickedX, pointClickedY));
+                        zoomWidth = mediumSizedBitmap.Width;
+                        zoomHeight = mediumSizedBitmap.Height;
                     }
-                    if (zoomFactor == 2)
+                    else
                     {
                         pictureBox1.Image = fullSizedBitmap;
-
-                        int realClickX = x * 2;
-                        int realClickY = y * 2;
-
-                        xTransformed = -1 * realClickX;
-                        xTransformed += dbPanel1.Width / 2;
-                        yTransformed = -1 * realClickY;
-                        yTransformed += dbPanel1.Height / 2;
-
-                        pictureBox1.Location = new Point(xTransformed, yTransformed);
-
-                        Moves.Push(new Tuple<float, float>(x, y));
+                        zoomWidth = fullSizedBitmap.Width;
+                        zoomHeight = fullSizedBitmap.Height;
                     }
+
+                    xTransformed = x * 2;
+                    xTransformed -= dbPanel1.Width / 2;
+
+                    yTransformed = y * 2;
+                    yTransformed -= dbPanel1.Height / 2;
+
+                    if (xTransformed < 0)
+                        xTransformed = 0;
+
+                    if (xTransformed + (dbPanel1.Width / 2) > zoomWidth - dbPanel1.Width / 2)
+                        xTransformed = zoomWidth - dbPanel1.Width;
+
+                    if(yTransformed < 0)
+                        yTransformed = 0;
+
+                    if (yTransformed + (dbPanel1.Height / 2) > zoomHeight - dbPanel1.Height / 2)
+                        yTransformed = zoomHeight - dbPanel1.Height;
+
+                    pictureBox1.Location = new Point(-1 * xTransformed, -1 * yTransformed);
                 }
             }
             else
