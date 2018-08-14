@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.DrawButton = new System.Windows.Forms.Button();
             this.dbPanel1 = new OSM_Visualization.DBPanel();
             this.textBox1 = new System.Windows.Forms.TextBox();
@@ -97,6 +98,7 @@
             this.ClientSize = new System.Drawing.Size(994, 585);
             this.Controls.Add(this.DrawButton);
             this.Controls.Add(this.dbPanel1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainWindow";
             this.Text = "Map Visualization";
             this.dbPanel1.ResumeLayout(false);
