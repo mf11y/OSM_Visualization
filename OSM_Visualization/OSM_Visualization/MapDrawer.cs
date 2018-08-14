@@ -13,7 +13,11 @@ namespace OSM_Visualization
         Bitmap bitmap;
         OSMDataManager loader;
         Graphics gr;
+
+        //linePoints has all the lines needed to draw a map.
         ConcurrentBag<Tuple<float, float, float, float>> linePoints;
+
+        //The points need to be transformed (rotated and normalized) to draw onto a bitmap.Contains tranformed points
         ConcurrentBag<Tuple<float, float, float, float>> transformedPoints;
 
 
@@ -23,14 +27,12 @@ namespace OSM_Visualization
 
             gr = Graphics.FromImage(bitmap);
             gr.SmoothingMode = SmoothingMode.AntiAlias;
-            //gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            //gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
-            //gr.CompositingQuality = CompositingQuality.HighQuality;
 
             linePoints = new ConcurrentBag<Tuple<float, float, float, float>>();
             transformedPoints = new ConcurrentBag<Tuple<float, float, float, float>>();
         }
 
+        //Gets the lines needed to draw map, tranforms, and draws onto a bitmap
         public Bitmap DrawMap(ref OSMDataManager xmlData)
         {
             loader = xmlData;
@@ -44,6 +46,7 @@ namespace OSM_Visualization
             return bitmap;
         }
 
+        //Loops through the list of node lists to save end points of a line
         private void GetPoints()
         {
             Parallel.ForEach(loader.waysConnectionInfo, way =>
@@ -65,6 +68,7 @@ namespace OSM_Visualization
             });
         }
 
+        //TRansform the points concurrently. normalize and rotate
         private void TransformPoints()
         {
             int H = bitmap.Height;
@@ -102,6 +106,7 @@ namespace OSM_Visualization
 
         private static readonly Pen myPen = new Pen(Brushes.White, 2);
 
+        //Draws the transformed points to bitmap
         private void DrawToBitmap()
         {
             gr.Clear(Color.Black);

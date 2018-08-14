@@ -2,7 +2,6 @@
 using System.Drawing;
 using System;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace OSM_Visualization
 {
@@ -10,14 +9,17 @@ namespace OSM_Visualization
     {
         string fileLoc;
 
+        //Mapdrawer creates a bitmap from the OSM file, OSMDATAMANAGER contains the parsed data needed to create image
         MapDrawer drawer;
         OSMDataManager xmlData;
 
+        //Various sized bitmaps for zoom in/out
         Bitmap fullSizedBitmap;
         Bitmap mediumSizedBitmap;
         Bitmap fullSizedBitmapResize;
 
 
+        //Initializes window component
         public MainWindow()
         {
             InitializeComponent();
@@ -40,12 +42,14 @@ namespace OSM_Visualization
 
         }
 
+        //Drag enter event
         void Main_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 e.Effect = DragDropEffects.Copy;
         }
 
+        //Drag drop event, makes draw button active after dragging in file
         void Main_DragDrop(object sender, DragEventArgs e)
         {
             DrawButton.Enabled = true;
@@ -53,6 +57,7 @@ namespace OSM_Visualization
             fileLoc = fileArgs[0];
         }
 
+        //Handles what happens when button is clicked
         void Draw_buttonClick(object sender, EventArgs e)
         {
             textBox1.Visible = true;
@@ -60,6 +65,7 @@ namespace OSM_Visualization
             LoadAndDraw();
         }
 
+        //Parses OSM file and creates bitmaps that contain the map
         async void LoadAndDraw()
         {
             textBox1.Text = "Loading in Nodes...";
@@ -80,26 +86,25 @@ namespace OSM_Visualization
             textBox1.Visible = false;
         }
 
+        //Resizes main bitmaps for various zooms
         private void CreateBitmaps()
         {
             mediumSizedBitmap = new Bitmap(fullSizedBitmap, dbPanel1.Width*2, dbPanel1.Height*2);
             fullSizedBitmapResize = new Bitmap(fullSizedBitmap, dbPanel1.Width, dbPanel1.Height);
         }
 
-
+        //Changes the picturebox image to a resized bitmap that can fit inside
         private void RefreshScreen()
         {
             pictureBox1.Image = fullSizedBitmapResize;
         }
 
-        private void pictureBox1_MouseHover(object sender, EventArgs e)
-        {
-            pictureBox1.Focus();
-        }
-
+        //zoomFactor is what zoom level we're currently in, zoom limit it the max zoomlevel allowed
         int zoomFactor = 0;
         const int zoomLimit = 2;
 
+        //ZOoms in/out. To zoom in, the bitmap in the picture box is changed to a bigger sized rendering of the map
+        //This makes it so the picture box is focusing on one section of a bigger bitmap and creates the effect of zooming
         private void pictureBox1_MouseWheel(object sender, MouseEventArgs e)
         {
             if (e.Delta > 0)
@@ -156,7 +161,7 @@ namespace OSM_Visualization
             {
                 if(zoomFactor == 1)
                 {
-                    pictureBox1.Image = fullSizedBitmapResize;
+                    RefreshScreen();
                     pictureBox1.Location = new Point(0, 0);
                     zoomFactor--;
                 }
@@ -186,10 +191,13 @@ namespace OSM_Visualization
             }
         }
 
+        //Is the mouse down?
         bool mouseDown;
 
+        //Original point of mouse down
         Point mouseDownPoint = new Point();
 
+        //Changes mouse down to true and records point 
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
         {
             mouseDown = true;
@@ -197,7 +205,7 @@ namespace OSM_Visualization
             mouseDownPoint.Y = e.Y;
         }
 
-
+        //Pan effect. Moves the location of the picture box to reveal more of the image.
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
             if(mouseDown && zoomFactor!= 0 )
@@ -207,10 +215,10 @@ namespace OSM_Visualization
                 x = pictureBox1.Location.X - (mouseDownPoint.X - e.X);
                 y = pictureBox1.Location.Y - (mouseDownPoint.Y - e.Y);
 
-                if (!(x < 0 && x > pictureBox1.Width * -1 + 1920))
+                if ((x > 0 || x < pictureBox1.Width * -1 + dbPanel1.Width))
                     x = pictureBox1.Location.X;
 
-                if (!(y < 0 && y > pictureBox1.Height * -1 + 1080))
+                if ((y > 0 || y < pictureBox1.Height * -1 + dbPanel1.Height))
                     y = pictureBox1.Location.Y;
 
                pictureBox1.Location = new Point(x, y);
@@ -218,6 +226,7 @@ namespace OSM_Visualization
             }
         }
 
+        //When user release mouse, mousedown is false
         private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
         {
             mouseDown = false;

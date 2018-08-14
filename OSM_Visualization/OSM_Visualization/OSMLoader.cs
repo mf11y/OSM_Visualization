@@ -9,14 +9,20 @@ namespace OSM_Visualization
 {
     class OSMDataManager : IDisposable
     {
+
+        //OSM file contains these data. Important for drawing map bounds
         public float minLat { get; private set; }
         public float minLon { get; private set; }
         public float maxLat { get; private set; }
         public float maxLon { get; private set; }
 
-        public ConcurrentDictionary<string, Tuple<string,string>> dict;
+        //Dictionary for fast lookup of node info
+        public Dictionary<string, Tuple<string,string>> dict;
+
+        //Each internal list contains a list of nodes
         public List<List<string>> waysConnectionInfo { get; private set; }
 
+        //Calls parseXML
         public OSMDataManager(string fileLoc)
         {
 
@@ -24,7 +30,7 @@ namespace OSM_Visualization
 
 
             int concurrencyLevel = Environment.ProcessorCount * 2;
-            dict = new ConcurrentDictionary<string, Tuple<string, string>>(concurrencyLevel, 2000003);
+            dict = new Dictionary();
             waysConnectionInfo = new List<List<string>>();
 
             ParseXML(ref xReader);
@@ -32,8 +38,7 @@ namespace OSM_Visualization
 
         }
 
-
-
+        //Sequentially goes over the xml file and parses the data it needs to create a drawing of a map
         private void ParseXML(ref XmlReader File)
         {
             bool member = false;
@@ -78,7 +83,7 @@ namespace OSM_Visualization
                             }
                             break;
                         case "node":
-                            dict.TryAdd(File.GetAttribute("id"),
+                            dict.Add(File.GetAttribute("id"),
                                             new Tuple<string, string>(File.GetAttribute("lat"), File.GetAttribute("lon")));
                             break;
                         case "member":
