@@ -30,7 +30,7 @@ namespace OSM_Visualization
 
 
             int concurrencyLevel = Environment.ProcessorCount * 2;
-            dict = new Dictionary();
+            dict = new Dictionary<string, Tuple<string, string>>();
             waysConnectionInfo = new List<List<string>>();
 
             ParseXML(ref xReader);
